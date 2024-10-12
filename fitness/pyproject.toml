@@ -8,6 +8,12 @@ packages = [{include = "fitness", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+ruff = "^0.6.9"
+mypy = "^1.11.2"
+toml = "^0.10.2"
+jupytext = "^1.16.4"
+pandas = "^2.2.3"
+plotly = "^5.24.1"
 
 
 [build-system]
