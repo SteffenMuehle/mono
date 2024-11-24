@@ -1,0 +1,10 @@
+general {
+    output_format = "xmobar"
+    separator = "  |  "
+}
+
+order += "tztime berlin"
+
+tztime berlin {
+        format = "%d.%m.%Y - %A, week %W, %H:%M:%S (%Z) "
+}

@@ -1,0 +1,6 @@
+regolith.wallpaper.file: /usr/share/desktop-base/softwaves-theme/wallpaper/gnome-background.xml
+regolith.lockscreen.wallpaper.file: /usr/share/desktop-base/softwaves-theme/wallpaper/gnome-background.xml
+gnome.terminal.font: RobotoMono Nerd Font 14
+wm.workspace.01.name: 1: 1: Terminal
+wm.workspace.02.name: 2: 2: Browser
+wm.workspace.03.name: 3: 3: IDE

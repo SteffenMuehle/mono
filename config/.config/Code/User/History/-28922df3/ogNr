@@ -1,0 +1,44 @@
+
+###########
+# ALIASES #
+###########
+alias docker="podman"
+alias docker-compose="podman-compose"
+alias cd1='cd ~/code/fleet-optimization-parameter-optimization'
+
+
+########
+# PATH #
+########
+# add ~.local/bin to beginning of PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# add cargo to PATH
+export PATH="$HOME/.cargo/env:$PATH"
+
+#################
+# ENV VARIABLES #
+#################
+
+# activate direnv hook
+# eval "$(direnv hook zsh)"
+
+# scip location for cargo
+export SCIPOPTDIR=$(brew --prefix scip)
+
+
+########
+# KUBE #
+########
+export KUBETAIL_NAMESPACE="fleet-optimization"
+function k () { kubectl --namespace=$KUBETAIL_NAMESPACE --kubeconfig=$KUBECONFIG "$@" }
+function j() { awk '/^{/{print; fflush(); next} {print >"/dev/stderr" }'; }
+function k_dev () { export KUBECONFIG=/Users/steffen.muehle/.kube/moia-dev; }
+function k_int () { export KUBECONFIG=/Users/steffen.muehle/.kube/moia-int; }
+function k_prd () { export KUBECONFIG=/Users/steffen.muehle/.kube/moia-prd; }
+
+function ofch () { kubectl logs deploy/offer-creator-de-hamburg-01 -f --namespace=$KUBETAIL_NAMESPACE -c offer-creator --kubeconfig=$KUBECONFIG | j | jq '"\(.["@timestamp"] | .[0:19]) \(.level | .[0:3]) \(.traceId): \(.message)"' -r; }
+
+function foh () { kubectl logs deploy/fleet-optimizer-de-hamburg-01 -f --namespace=$KUBETAIL_NAMESPACE -c fleet-optimizer --kubeconfig=$KUBECONFIG | j | jq '"\(.["@timestamp"] | .[0:19]) \(.level | .[0:3]) \(.serviceArea) \(.traceId): \(.message)"' -r; }
+
+function foch () { kubectl logs deploy/fleet-optimization-coordinator -f --namespace=$KUBETAIL_NAMESPACE -c fleet-optimization-coordinator --kubeconfig=$KUBECONFIG | j | jq '"\(.["@timestamp"] | .[0:19]) \(.level | .[0:3]) \(.serviceArea) \(.traceId): \(.message)"' -r; }

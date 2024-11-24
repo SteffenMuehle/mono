@@ -1,0 +1,242 @@
+source ~/.zshrc_moia
+
+# History settings
+HISTSIZE=100000                  # Maximum number of history entries in memory
+SAVEHIST=100000                  # Maximum number of history entries saved to file
+HISTFILE=~/.zsh_history          # File to save history
+
+# History behavior
+setopt SHARE_HISTORY             # Share history between all zsh sessions
+setopt HIST_IGNORE_SPACE         # Ignore commands with leading spaces in history
+setopt HIST_IGNORE_ALL_DUPS      # Ignore duplicate commands in history
+setopt INC_APPEND_HISTORY        # Append commands to history file as they're entered
+setopt EXTENDED_HISTORY          # Record timestamps with each command in history
+
+# Key bindings for history substring search
+source $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+bindkey '^[[A' history-substring-search-up    # Up arrow for partial history search
+bindkey '^[[B' history-substring-search-down  # Down arrow for partial history search
+
+# Globbing and matching settings
+setopt extendedglob              # Enable advanced pattern matching (e.g., **/*.txt)
+setopt nomatch                   # Prevent errors if no files match a glob pattern
+
+# Miscellaneous settings
+unsetopt beep                    # Disable bell sound on errors
+unsetopt autocd                  # Disable automatic 'cd' into directories
+
+# Load and initialize autocompletion
+autoload -Uz compinit
+compinit
+
+###########
+# ALIASES #
+###########
+alias ls='eza --sort type --icons --git'
+alias l='eza --all --sort type --icons --git'
+alias cc='cd ..'
+alias ccc='cd ..; cd ..'
+alias cccc='cd ..; cd ..; cd ..'
+alias r='. ranger' # '.-prefix' to switch to the directory ranger is quit in
+alias f='fzf'
+alias path='echo $PATH | tr ":" "\n"'
+alias edit='code -n'
+alias ez='code -n ~/.zshrc'
+alias sz='source ~/.zshrc'
+alias cz='cp ~/.zshrc ~/code/config/shell/.zshrc_moia'
+alias docker="podman"
+alias docker-compose="podman-compose"
+alias h="history 1 | grep"
+# cd paths
+alias cd1='cd ~/code/fleet-optimization-parameter-optimization'
+#alias nb-down='poetry run jupytext --to py:percent'
+#alias nb-up='poetry run jupytext --to notebook'
+
+
+
+
+############
+# JUPYTEXT #
+############
+# Function to convert Python script(s) to Jupyter notebook(s)
+nb_up() {
+  if [ -z "$1" ]; then
+    # No arguments, convert all .py files in the current directory
+    for py_file in *.py; do
+      ipynb_file="${py_file%.py}.ipynb"
+      if [ -f "$ipynb_file" ]; then
+        rm "$ipynb_file"
+      fi
+      poetry run jupytext --to notebook "$py_file"
+    done
+  else
+    for arg in "$@"; do
+      base_name="${arg%.*}"  # Strip the file extension
+      if [ -f "${base_name}.py" ]; then
+        # Argument is a file
+        ipynb_file="${base_name}.ipynb"
+        if [ -f "$ipynb_file" ]; then
+          rm "$ipynb_file"
+        fi
+        poetry run jupytext --to notebook "${base_name}.py"
+      elif [ -d "$base_name" ]; then
+        # Argument is a directory, convert all .py files in the directory
+        for py_file in "$base_name"/*.py; do
+          ipynb_file="${py_file%.py}.ipynb"
+          if [ -f "$ipynb_file" ]; then
+            rm "$ipynb_file"
+          fi
+          poetry run jupytext --to notebook "$py_file"
+        done
+      else
+        echo "Error: ${arg} is neither a file nor a directory"
+      fi
+    done
+  fi
+}
+
+# Function to convert Jupyter notebook(s) to Python script(s)
+nb_down() {
+  if [ -z "$1" ]; then
+    # No arguments, convert all .ipynb files in the current directory
+    for ipynb_file in *.ipynb; do
+      poetry run jupytext --to py:percent "$ipynb_file"
+    done
+  else
+    for arg in "$@"; do
+      base_name="${arg%.*}"  # Strip the file extension
+      if [ -f "${base_name}.ipynb" ]; then
+        # Argument is a file
+        poetry run jupytext --to py:percent "${base_name}.ipynb"
+      elif [ -d "$base_name" ]; then
+        # Argument is a directory, convert all .ipynb files in the directory
+        for ipynb_file in "$base_name"/*.ipynb; do
+          poetry run jupytext --to py:percent "$ipynb_file"
+        done
+      else
+        echo "Error: ${arg} is neither a file nor a directory"
+      fi
+    done
+  fi
+}
+
+# Function to delete all .ipynb files
+nb_clean() {
+  if [ -z "$1" ]; then
+    # No arguments, delete all .ipynb files in the current directory
+    rm -f *.ipynb
+  else
+    for arg in "$@"; do
+      base_name="${arg%.*}"  # Strip the file extension
+      if [ -d "$base_name" ]; then
+        # Argument is a directory, delete all .ipynb files in the directory
+        rm -f "$base_name"/*.ipynb
+      elif [ -f "${base_name}.ipynb" ]; then
+        # Argument is a file, delete the specific .ipynb file
+        rm -f "${base_name}.ipynb"
+      else
+        echo "Error: ${arg} is neither a directory nor a .ipynb file"
+      fi
+    done
+  fi
+}
+
+# Aliases to call the functions
+alias nb-up='nb_up'
+alias nb-down='nb_down'
+alias nb-clean='nb_clean'
+
+
+#############
+# FUNCTIONS #
+#############
+# Function to get the current Git branch
+gitb() {
+  git rev-parse --abbrev-ref HEAD 2>/dev/null
+}
+
+
+############
+# TERMINAL #
+############
+
+COLOR_DEF=$'%f'
+COLOR_USR=$'%F{243}'
+COLOR_DIR=$'%F{208}'
+COLOR_GIT=$'%F{39}'
+setopt PROMPT_SUBST
+NEWLINE=$'\n'
+
+
+# Function to calculate the maximum length dynamically
+calculate_max_length() {
+  local dir_length=${#${(%):-%~}}
+  local gitb_length=${#$(gitb)}
+  echo $(( dir_length > gitb_length ? dir_length : gitb_length ))
+}
+
+# Function to generate the banner with hashes dynamically
+generate_banner() {
+  local max_length=$(calculate_max_length)
+  local banner_length=$(( max_length + 4 ))  # +4 to account for spaces and hashes on both sides
+  printf '%*s' "$banner_length" '' | tr ' ' '#'
+}
+
+# Function to pad content with spaces and add a hash at the end dynamically
+pad_content() {
+  local content="$1"
+  local max_length=$(calculate_max_length)
+  local content_length=${#${(%)content}}
+  local padding_length=$(( max_length - content_length + 1 ))  # +1 to account for the final hash
+  printf '%s%*s' "$content" "$padding_length" ''
+}
+
+# Update PROMPT to use the dynamic banner and aligned hashes
+export PROMPT='${NEWLINE}${COLOR_USR}$(generate_banner)
+${COLOR_USR}# ${COLOR_GIT}$(pad_content "$(gitb)")${COLOR_USR}#
+${COLOR_USR}# ${COLOR_DIR}$(pad_content "%~")${COLOR_USR}#
+${COLOR_USR}$(generate_banner)
+${COLOR_DEF}$ '
+
+# eval "$(oh-my-posh init zsh)"
+
+########
+# PATH #
+########
+
+# add ~.local/bin to beginning of PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# add cargo to PATH
+export PATH="$HOME/.cargo/env:$PATH"
+
+# activate mise
+eval "$(/Users/steffen.muehle/.local/bin/mise activate zsh)"
+
+
+#################
+# ENV VARIABLES #
+#################
+
+# activate direnv hook
+eval "$(direnv hook zsh)"
+
+# scip location for cargo
+export SCIPOPTDIR=$(brew --prefix scip)
+
+
+########
+# KUBE #
+########
+export KUBETAIL_NAMESPACE="fleet-optimization"
+function k () { kubectl --namespace=$KUBETAIL_NAMESPACE --kubeconfig=$KUBECONFIG "$@" }
+function j() { awk '/^{/{print; fflush(); next} {print >"/dev/stderr" }'; }
+function k_dev () { export KUBECONFIG=/Users/steffen.muehle/.kube/moia-dev; }
+function k_int () { export KUBECONFIG=/Users/steffen.muehle/.kube/moia-int; }
+function k_prd () { export KUBECONFIG=/Users/steffen.muehle/.kube/moia-prd; }
+
+function ofch () { kubectl logs deploy/offer-creator-de-hamburg-01 -f --namespace=$KUBETAIL_NAMESPACE -c offer-creator --kubeconfig=$KUBECONFIG | j | jq '"\(.["@timestamp"] | .[0:19]) \(.level | .[0:3]) \(.traceId): \(.message)"' -r; }
+
+function foh () { kubectl logs deploy/fleet-optimizer-de-hamburg-01 -f --namespace=$KUBETAIL_NAMESPACE -c fleet-optimizer --kubeconfig=$KUBECONFIG | j | jq '"\(.["@timestamp"] | .[0:19]) \(.level | .[0:3]) \(.serviceArea) \(.traceId): \(.message)"' -r; }
+
+function foch () { kubectl logs deploy/fleet-optimization-coordinator -f --namespace=$KUBETAIL_NAMESPACE -c fleet-optimization-coordinator --kubeconfig=$KUBECONFIG | j | jq '"\(.["@timestamp"] | .[0:19]) \(.level | .[0:3]) \(.serviceArea) \(.traceId): \(.message)"' -r; }

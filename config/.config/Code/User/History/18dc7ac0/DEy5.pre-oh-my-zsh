@@ -1,0 +1,122 @@
+# source ~/.zshrc_moia
+
+# History settings
+HISTSIZE=100000                  # Maximum number of history entries in memory
+SAVEHIST=100000                  # Maximum number of history entries saved to file
+HISTFILE=~/.zsh_history          # File to save history
+
+# History behavior
+setopt SHARE_HISTORY             # Share history between all zsh sessions
+setopt HIST_IGNORE_SPACE         # Ignore commands with leading spaces in history
+setopt INC_APPEND_HISTORY        # Append commands to history file as they're entered
+setopt EXTENDED_HISTORY          # Record timestamps with each command in history
+
+# Key bindings for history substring search
+if [ -f "$HOME/.zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]; then
+    echo "loading zsh-history-substring-search"
+    source "$HOME/.zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+fi
+
+# Globbing and matching settings
+setopt extendedglob              # Enable advanced pattern matching (e.g., **/*.txt)
+setopt nomatch                   # Prevent errors if no files match a glob pattern
+
+# Miscellaneous settings
+unsetopt beep                    # Disable bell sound on errors
+unsetopt autocd                  # Disable automatic 'cd' into directories
+
+# Load and initialize autocompletion
+autoload -Uz compinit
+compinit
+
+###########
+# ALIASES #
+###########
+alias ls='eza --sort type --icons --git'
+alias l='eza --all --sort type --icons --git'
+alias cc='cd ..'
+alias ccc='cd ..; cd ..'
+alias cccc='cd ..; cd ..; cd ..'
+alias f='fzf'
+alias path='echo $PATH | tr ":" "\n"'
+alias edit='code -n'
+alias ez='code -n ~/.zshrc'
+alias sz='source ~/.zshrc'
+alias docker="podman"
+alias docker-compose="podman-compose"
+# cd paths
+alias cd1='cd ~/code/fleet-optimization-parameter-optimization'
+#alias nb-down='poetry run jupytext --to py:percent'
+#alias nb-up='poetry run jupytext --to notebook'
+
+
+#############
+# FUNCTIONS #
+#############
+# Function to get the current Git branch
+gitb() {
+  git rev-parse --abbrev-ref HEAD 2>/dev/null
+}
+
+
+############
+# TERMINAL #
+############
+
+COLOR_DEF=$'%f'
+COLOR_USR=$'%F{243}'
+COLOR_DIR=$'%F{208}'
+COLOR_GIT=$'%F{39}'
+setopt PROMPT_SUBST
+NEWLINE=$'\n'
+
+
+# Function to calculate the maximum length dynamically
+calculate_max_length() {
+  local dir_length=${#${(%):-%~}}
+  local gitb_length=${#$(gitb)}
+  echo $(( dir_length > gitb_length ? dir_length : gitb_length ))
+}
+
+# Function to generate the banner with hashes dynamically
+generate_banner() {
+  local max_length=$(calculate_max_length)
+  local banner_length=$(( max_length + 4 ))  # +4 to account for spaces and hashes on both sides
+  printf '%*s' "$banner_length" '' | tr ' ' '#'
+}
+
+# Function to pad content with spaces and add a hash at the end dynamically
+pad_content() {
+  local content="$1"
+  local max_length=$(calculate_max_length)
+  local content_length=${#${(%)content}}
+  local padding_length=$(( max_length - content_length + 1 ))  # +1 to account for the final hash
+  printf '%s%*s' "$content" "$padding_length" ''
+}
+
+# Update PROMPT to use the dynamic banner and aligned hashes
+export PROMPT='${NEWLINE}${COLOR_USR}$(generate_banner)
+${COLOR_USR}# ${COLOR_GIT}$(pad_content "$(gitb)")${COLOR_USR}#
+${COLOR_USR}# ${COLOR_DIR}$(pad_content "%~")${COLOR_USR}#
+${COLOR_USR}$(generate_banner)
+${COLOR_DEF}$ '
+
+# eval "$(oh-my-posh init zsh)"
+
+########
+# PATH #
+########
+
+# add ~.local/bin to beginning of PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# activate mise
+eval "$($HOME/.local/bin/mise activate zsh)"
+
+
+#################
+# ENV VARIABLES #
+#################
+# export FOO=bar
