@@ -31,5 +31,5 @@ if __name__ == "__main__":
     for file_name in [
         "base.toml",
     ]:
-        file_path = Path(__file__).parent.parent.parent / "input" / "graph" / file_name
+        file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / file_name
         prompt_values(file_path)

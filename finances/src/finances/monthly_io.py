@@ -1,7 +1,7 @@
 import toml
 from pathlib import Path
 
-relative_path = Path(__file__).parent.parent.parent / "input"
+relative_path = Path(__file__).parent.parent.parent / "data" / "input"
 toml_file_path = relative_path / "io.toml"
 io = toml.load(toml_file_path)
 

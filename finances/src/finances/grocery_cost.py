@@ -3,7 +3,7 @@ from pathlib import Path
 
 num_months = 6
 
-relative_path = Path(__file__).parent.parent.parent / "manual_logs" / "monthly_estimate_2024_april_to_october"
+relative_path = Path(__file__).parent.parent.parent / "data" / "manual_logs" / "monthly_estimate_2024_april_to_october"
 file_names = [
     ("edeka.csv", ';'),
     ("budni.csv", ';'),

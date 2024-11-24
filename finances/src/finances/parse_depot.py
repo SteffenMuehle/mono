@@ -62,8 +62,8 @@ def update_toml_from_csv(toml_file_path, csv_file_path):
         print(f" - {csv_id}")
 
 if __name__ == "__main__":
-    relative_toml_folder_path = Path(__file__).parent.parent.parent / "input" / "graph"
-    relative_csv_folder_path = Path(__file__).parent.parent.parent / "input" / "depot"
+    relative_toml_folder_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph"
+    relative_csv_folder_path = Path(__file__).parent.parent.parent / "data" / "input" / "depot"
     most_recent_csv_file = sorted(relative_csv_folder_path.glob("*.csv"))[-1]
     csv_file_path = relative_csv_folder_path / most_recent_csv_file
 

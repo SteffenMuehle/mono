@@ -245,8 +245,8 @@ class Graph:
         return cls(nodes=nodes)
 
 if __name__ == "__main__":
-    input_path = Path(__file__).parent.parent.parent / "input" / "graph"
-    output_path = Path(__file__).parent.parent.parent / "output"
+    input_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph"
+    output_path = Path(__file__).parent.parent.parent / "data" / "output"
 
     #read graphs
     base_graph = Graph.from_toml(input_path / "base.toml")

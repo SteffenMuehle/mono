@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOML_FILE="input/graph/crypto.toml"
+TOML_FILE="data/input/graph/crypto.toml"
 
 while IFS= read -r line; do
     # Detect the start of a section, e.g., [stellar]

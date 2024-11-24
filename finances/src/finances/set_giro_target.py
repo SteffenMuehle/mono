@@ -3,8 +3,8 @@ from pathlib import Path
 
 TARGET_NUMBER_OF_MONTHLY_COSTS_IN_GIRO = 4
 
-file_path_io = Path(__file__).parent.parent.parent / "input" / "io.toml"
-file_path_graph_leaves = Path(__file__).parent.parent.parent / "input" / "graph" / "base.toml"
+file_path_io = Path(__file__).parent.parent.parent / "data" / "input" / "io.toml"
+file_path_graph_leaves = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "base.toml"
 
 # get target
 io = toml.load(file_path_io)
