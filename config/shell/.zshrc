@@ -1,5 +1,5 @@
 #source ~/.zshrc_moia
-source ~/.zshrc_setd
+source ~/.zshrc_savedir
 
 #############
 # OH-MY-ZSH #
@@ -77,19 +77,23 @@ gitb() {
 # write function 'cpd' (CoPy Directory) used as for example 'cpm 3' that takes the current directory (say /home/user/Downloads)
 # and creates the alias/variable 'd3' that takes holds that directory.
 # so for example one could then "cd $d3" to go to /home/user/Downloads or "ls $d3" to list the contents of /home/user/Downloads
-setdir() {
+savedir() {
   local dir=$(pwd)
+  if [ -z "$num" ]; then
+    grep '^dir' ~/.zshrc_savedir
+    return
+  fi
   local num=$1
   local var="dir$num"
   eval "$var=$dir"
   echo "Created variable $var with value $dir"
   alias "cd$num"="cd $dir"
   echo "Created alias cd$num for changing to $dir"
-  sed -i "/alias cd$num/d" ~/.zshrc_setd
-  sed -i "/$var=/d" ~/.zshrc_setd
-  echo "alias cd$num=\"cd $dir\"" >> ~/.zshrc_setd
-  echo "$var=\"$dir\"" >> ~/.zshrc_setd
-  echo "Saved alias and variable in ~/.zshrc_setd"
+  sed -i "/alias cd$num/d" ~/.zshrc_savedir
+  sed -i "/$var=/d" ~/.zshrc_savedir
+  echo "alias cd$num=\"cd $dir\"" >> ~/.zshrc_savedir
+  echo "$var=\"$dir\"" >> ~/.zshrc_savedir
+  echo "Saved alias and variable in ~/.zshrc_savedir"
 }
 
 ##########
