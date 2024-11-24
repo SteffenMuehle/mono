@@ -7,7 +7,7 @@ from IPython.display import display
 
 # %%
 # load data
-input_path = Path.cwd().parent / 'input'
+input_path = Path.cwd().parent / 'data'
 file_name = "workouts.csv"
 file_path = input_path / file_name
 df = pd.read_csv(file_path)
