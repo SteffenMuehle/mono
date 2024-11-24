@@ -134,7 +134,7 @@ pad_content() {
 generate_prompt() {
   local ls_output=$(ls -al | awk '
     BEGIN { files=0; dirs=0 }
-    /^-/ { files++ }
+    /^./ { files++ }
     /^d/ { dirs++ }
     END { print files " files, " dirs " folders" }
   ')
