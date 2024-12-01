@@ -5,6 +5,8 @@ import os
 import csv
 from datetime import datetime
 from pathlib import Path
+import plotly.graph_objects as go
+from collections import defaultdict
 
 class Node:
     def __init__(
@@ -172,6 +174,62 @@ class Graph:
                     penwidth='2'
                 )
         return graph.render(output_path, format="svg", cleanup=True)
+        
+    def plot_sankey(self, output_path):
+        nodes = []
+        links = []
+        values = []
+
+        # Create a mapping from node id to index
+        node_id_to_index = {}
+        for i, node in enumerate(self.nodes):
+            node_id_to_index[node.id] = i
+
+        parent_to_children = defaultdict(list)
+        # Group nodes by their parent
+        for node in self.nodes:
+            parent_to_children[node.parent].append(node)
+
+        # Sort each group by current_amount
+        for parent, children in parent_to_children.items():
+            children.sort(key=lambda x: x.current_amount if x.current_amount else 0, reverse=True)
+
+        # Rebuild nodes and links based on sorted order
+        sorted_nodes = []
+        sorted_node_id_to_index = {}
+        for parent, children in parent_to_children.items():
+            for child in children:
+                sorted_node_id_to_index[child.id] = len(sorted_nodes)
+                sorted_nodes.append(child)
+
+        for node in sorted_nodes:
+            nodes.append(node.print_name)
+            values.append(node.current_amount if node.current_amount else 0)
+            if node.parent and node.parent in sorted_node_id_to_index:
+                links.append({
+                    'source': sorted_node_id_to_index[node.parent],
+                    'target': sorted_node_id_to_index[node.id],
+                    'value': node.current_amount if node.current_amount else 0
+                })
+
+        fig = go.Figure(data=[go.Sankey(
+            node=dict(
+                pad=15,
+                thickness=20,
+                line=dict(color="black", width=0.5),
+                label=nodes,
+                color="blue",
+            ),
+            link=dict(
+                source=[link['source'] for link in links],
+                target=[link['target'] for link in links],
+                value=[link['value'] for link in links],
+                color="lightblue",
+            ))])
+
+        fig.update_layout(title_text="Sankey Diagram", font_size=10)
+        fig.write_image(str(output_path) + ".png")
+
 
     def absorb_graph(
         self,
