@@ -158,12 +158,12 @@ class Graph:
             # Customize node appearance
             graph.node(
                 node.id,
-                label=node.print_name + f"\n current: {round(node.current_amount,ndigits=1)}" + f"\n target: {round(node.target_amount,ndigits=1)}",
-                shape='ellipse',
+                label=node.print_name + f"\n {int(round(node.current_amount,ndigits=0))}",
+                shape='box',
                 style='filled',
                 color=color,
                 fontname='Helvetica',
-                fontsize='10'
+                fontsize='10',
             )
             if node.parent:
                 # Customize edge appearance
@@ -171,7 +171,9 @@ class Graph:
                     node.parent,
                     node.id,
                     color='black',
-                    penwidth='2'
+                    #weight=str(node.target_amount),
+                    label=(str(int(round(100*node.weight,ndigits=0)))+"%" if node.weight else "fixed") + " = " + str(int(round(node.target_amount,ndigits=0))),
+                    fontsize='9',
                 )
         return graph.render(output_path, format="svg", cleanup=True)
         
@@ -307,7 +309,7 @@ if __name__ == "__main__":
     output_path = Path(__file__).parent.parent.parent / "data" / "output"
 
     #read graphs
-    base_graph = Graph.from_toml(input_path / "base.toml")
+    base_graph = Graph.from_toml(input_path / "main.toml")
     elisa_graph = Graph.from_toml(input_path / "elisa.toml")
     canada_graph = Graph.from_toml(input_path / "canada_fund.toml")
     investment_graph = Graph.from_toml(input_path / "investments.toml")
@@ -316,10 +318,7 @@ if __name__ == "__main__":
     #combine graphs
     base_graph.absorb_graph(elisa_graph)
     base_graph.absorb_graph(canada_graph)
-    investment_graph.absorb_graph(
-        crypto_graph,
-        node_id_to_attach_to="investments",
-    )
+    base_graph.absorb_graph(crypto_graph)
     base_graph.absorb_graph(
         investment_graph,
         node_id_to_attach_to="Steffen",
@@ -327,6 +326,7 @@ if __name__ == "__main__":
 
     #plot result
     base_graph.plot_graph(output_path / "graph") # inner function appends .svg suffix
+    base_graph.plot_sankey(output_path / "sankey_graph")  # New Sankey plot
 
     #save graph to csv
     base_graph.save_to_csv(output_path / "graph_history.csv")
