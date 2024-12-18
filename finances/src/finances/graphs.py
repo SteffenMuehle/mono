@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 import plotly.graph_objects as go
 from collections import defaultdict
+import numpy as np
 
 class Node:
     def __init__(
@@ -153,6 +154,10 @@ class Graph:
     
     def plot_graph(self, output_path: str = "graph.svg"):
         graph = Digraph()
+
+        total_amount = self._get_root().current_amount
+        min_font_size = 8
+        max_font_size = 16
         for node in self.nodes:
             color = 'lightblue' if node.frozen else 'orange'
             # Customize node appearance
@@ -166,6 +171,8 @@ class Graph:
                 fontsize='10',
             )
             if node.parent:
+                fraction = node.current_amount / total_amount
+                curr_font_size = max(min_font_size, max_font_size * np.sqrt(fraction))
                 # Customize edge appearance
                 graph.edge(
                     node.parent,
@@ -173,7 +180,7 @@ class Graph:
                     color='black',
                     #weight=str(node.target_amount),
                     label=(str(int(round(100*node.weight,ndigits=0)))+"%" if node.weight else "fixed") + " = " + str(int(round(node.target_amount,ndigits=0))),
-                    fontsize='9',
+                    fontsize=str(int(curr_font_size)),
                 )
         return graph.render(output_path, format="svg", cleanup=True)
         
