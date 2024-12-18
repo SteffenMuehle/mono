@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "filesyncer"
+version = "0.1.0"
+description = ""
+authors = ["steffen <steffen_muehle@gmx.de>"]
+readme = "README.md"
+packages = [{include = "filesyncer", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
