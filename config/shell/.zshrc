@@ -53,7 +53,10 @@ alias sz='source ~/.zshrc'
 alias p2n='poetry run jupytext --to notebook'
 alias n2p='poetry run jupytext --to py:percent'
 alias apt='sudo apt'
-
+alias install='sudo apt install'
+alias remove='sudo apt remove'
+alias click='xdg-open'
+alias hibernate='sudo systemctl hibernate'
 
 ########
 # PATH #
@@ -79,12 +82,12 @@ gitb() {
 # so for example one could then "cd $d3" to go to /home/user/Downloads or "ls $d3" to list the contents of /home/user/Downloads
 savedir() {
   local dir=$(pwd)
+  local num=$1
+  local var="dir$num"
   if [ -z "$num" ]; then
     grep '^dir' ~/.zshrc_savedir
     return
   fi
-  local num=$1
-  local var="dir$num"
   eval "$var=$dir"
   echo "Created variable $var with value $dir"
   alias "cd$num"="cd $dir"
