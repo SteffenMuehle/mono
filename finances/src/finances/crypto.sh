@@ -22,9 +22,9 @@ while IFS= read -r line; do
         total_value=$(printf "%.2f" "$(echo "$price * $number" | bc)")
 
         # Update the TOML file with the new price, current_amount, and target_amount
-        sed -i "" "/^\[$full_section\]/,/^price/s/^price.*/price = $price/" "$TOML_FILE"
-        sed -i "" "/^\[$full_section\]/,/^current_amount/s/^current_amount.*/current_amount = $total_value/" "$TOML_FILE"
-        sed -i "" "/^\[$full_section\]/,/^target_amount/s/^target_amount.*/target_amount = $total_value/" "$TOML_FILE"
+        sed -i "/^\[$full_section\]/,/^price/s/^price.*/price = $price/" "$TOML_FILE"
+        sed -i "/^\[$full_section\]/,/^current_amount/s/^current_amount.*/current_amount = $total_value/" "$TOML_FILE"
+        sed -i "/^\[$full_section\]/,/^target_amount/s/^target_amount.*/target_amount = $total_value/" "$TOML_FILE"
 
         echo "Updated $coin: total value: $total_value EUR   (price: $price EUR, number: $number)"
     fi
