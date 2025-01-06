@@ -22,41 +22,17 @@
 `input/io.expense.????`
 
 
-### 1. Update monthly statistics:
-`poetry run python src/finances/monthly_io.py`
+### run:
 
-
-### 2. Set target in giro
-`poetry run python src/finances/set_giro_target.py`
-
-
-### 3. Update data from depot
-1. log into https://www.comdirect.com
-2. go to depot
-3. download .csv file (`export as Excel format`)
-4. remove header and tail manually
-5. copy to `input/depot/`
-6. `poetry run python src/finances/parse_depot.py`
-
-
-### 4. Update crypto
-`bash src/finances/crypto.sh`
-
-
-### 5. Update other data
 1. Transfer Verrechnungskonto to giro
 2. Transfer giro to visa if visa<0
-2. `poetry run python src/finances/prompt_values.py`
-
-
-### 6. Run algorithm
-`poetry run python src/finances/graphs.py`
-
-
-### 7. git commit
-`git commit -am "report 2024-10-25"; git push`
-
-### 8. move money around
+3. depot csv:
+    - log into https://www.comdirect.com
+    - go to depot
+    - download .csv file (`export as Excel format`)
+    - remove header and tail manually
+    - copy to `input/depot/`
+3. `just start`
 
 
 # RUN YEARLY AFTER NEW YEAR'S EVE
