@@ -318,14 +318,20 @@ if __name__ == "__main__":
     #read graphs
     base_graph = Graph.from_toml(input_path / "main.toml")
     elisa_graph = Graph.from_toml(input_path / "elisa.toml")
-    canada_graph = Graph.from_toml(input_path / "canada_fund.toml")
+    set_aside_graph = Graph.from_toml(input_path / "set_aside.toml")
     investment_graph = Graph.from_toml(input_path / "investments.toml")
     crypto_graph = Graph.from_toml(input_path / "crypto.toml")
 
     #combine graphs
     base_graph.absorb_graph(elisa_graph)
-    base_graph.absorb_graph(canada_graph)
-    base_graph.absorb_graph(crypto_graph)
+    base_graph.absorb_graph(
+        set_aside_graph,
+        node_id_to_attach_to="root",
+    )
+    base_graph.absorb_graph(
+        crypto_graph,
+        node_id_to_attach_to="root",
+    )
     base_graph.absorb_graph(
         investment_graph,
         node_id_to_attach_to="Steffen",
