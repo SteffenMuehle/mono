@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "llm-summary"
+version = "0.1.0"
+description = ""
+authors = ["steffen <steffen_muehle@gmx.de>"]
+readme = "README.md"
+packages = [{include = "llm_summary", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+jupytext = "^1.16.6"
+openai = "^1.60.0"
+notebook = "^7.3.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
