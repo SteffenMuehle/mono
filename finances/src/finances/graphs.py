@@ -17,8 +17,6 @@ class Node:
         parent: Optional[str] = None,
         current_amount: Optional[float] = None,
         target_amount: Optional[float] = None,
-        children: Optional[list[str]] = None,
-        priority: Optional[float] = None,
         weight: Optional[float] = None,
     ):
         self.id = id
@@ -27,14 +25,10 @@ class Node:
         else:
             self.print_name = print_name
         self.parent = parent
-        if children is None:
-            self.children = []
-        else:
-            self.children = children
+        self.children = None
         self.current_amount = current_amount
         self.target_amount = target_amount
         self.frozen = self.target_amount is not None
-        self.priority = priority
         self.weight = weight
 
     def __repr__(self):
@@ -116,7 +110,7 @@ class Graph:
                 target_amount -= frozen_amount
 
                 # distribute remaining target_amount to remaining children
-                remaining_children = [child_id for child_id in children if not self._get_node(child_id).frozen and not self._get_node(child_id).priority]
+                remaining_children = [child_id for child_id in children if not self._get_node(child_id).frozen]
                 combined_weight = sum([self._get_node(child_id).weight for child_id in remaining_children])
                 for child_id in remaining_children:
                     child_node = self._get_node(child_id)
@@ -232,8 +226,6 @@ class Graph:
                         parent=parent_id,
                         current_amount=val.get("current_amount", None),
                         target_amount=val.get("target_amount", None),
-                        children=val.get("children", None),
-                        priority=val.get("priority", None),
                         weight=val.get("weight", None),
                     )
                     nodes.append(cur_node)
