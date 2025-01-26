@@ -182,7 +182,7 @@ class Graph:
                     label=(str(int(round(100*node.weight,ndigits=0)))+"%" if node.weight else "fixed") + " = " + str(int(round(node.target_amount,ndigits=0))),
                     fontsize=str(int(curr_font_size)),
                 )
-        return graph.render(output_path, format="svg", cleanup=True)
+        return graph.render(output_path, format="png", cleanup=True)
         
     def plot_sankey(self, output_path):
         nodes = []
