@@ -106,19 +106,9 @@ class Graph:
             for parent_id in current_parents:
                 parent_node = self._get_node(parent_id)
                 target_amount = parent_node.target_amount
-
                 children = self._get_children(parent_id)
-
-                # inherit to children with priority
-                children_with_priority = [child_id for child_id in children if self._get_node(child_id).priority]
-                amount_priority_inherited = 0
-                for child_id in children_with_priority:
-                    child_node = self._get_node(child_id)
-                    inherited_amount = target_amount * child_node.priority
-                    child_node.target_amount = inherited_amount
-                    new_parents.append(child_id)
-                    amount_priority_inherited += inherited_amount
-                target_amount -= amount_priority_inherited
+                if not children:
+                    continue
 
                 # remove frozen children's target_amount from target_amount
                 frozen_children = [child_id for child_id in children if self._get_node(child_id).frozen]
