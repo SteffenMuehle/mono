@@ -283,8 +283,7 @@ if __name__ == "__main__":
     )
 
     #plot result
-    base_graph.plot_graph(output_path / "graph") # inner function appends .svg suffix
-    base_graph.plot_sankey(output_path / "sankey_graph")  # New Sankey plot
+    base_graph.plot_graph(output_path / "graph") # inner function appends .png suffix
 
     #save graph to csv
     base_graph.save_to_csv(output_path / "graph_history.csv")
