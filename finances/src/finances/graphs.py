@@ -48,10 +48,7 @@ class Graph:
     ):
         self.nodes = nodes
         # fill in nodes' children
-        self._find_children()
-        self._propagate_current_amounts_up()
-        self._propagate_frozen_status_up()
-        self._propagate_target_amounts_down()
+        self._equilibrate()
 
     def _find_children(self):
         for node in self.nodes:
@@ -150,7 +147,13 @@ class Graph:
         while num_frozen_nodes_before != num_frozen_nodes_after:
             num_frozen_nodes_before = num_frozen_nodes_after
             self._propagate_frozen_status_up_one_step()
-            num_frozen_nodes_after = sum([node.frozen for node in self.nodes])       
+            num_frozen_nodes_after = sum([node.frozen for node in self.nodes]) 
+
+    def _equilibrate(self):
+        self._find_children()
+        self._propagate_current_amounts_up()
+        self._propagate_frozen_status_up()
+        self._propagate_target_amounts_down()      
     
     def plot_graph(self, output_path: str = "graph.svg"):
         graph = Digraph()
@@ -194,11 +197,8 @@ class Graph:
 
         self.nodes += graph_that_is_absorbed.nodes
         self._get_node(sub_root_id).parent = node_id_to_attach_to
+        self._equilibrate()
 
-        self._find_children()
-        self._propagate_current_amounts_up()
-        self._propagate_frozen_status_up()
-        self._propagate_target_amounts_down()
 
     def save_to_csv(
         self,
