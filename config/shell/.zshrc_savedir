@@ -1,0 +1,4 @@
+alias cd1="cd /home/steffen/repos/mono"
+dir1="/home/steffen/repos/mono"
+alias cd2="cd /home/steffen/data"
+dir2="/home/steffen/data"

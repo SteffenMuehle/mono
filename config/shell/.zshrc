@@ -1,5 +1,5 @@
-#source ~/.zshrc_moia
 source ~/.zshrc_savedir
+source ~/.zshrc_env_vars
 
 #############
 # OH-MY-ZSH #
