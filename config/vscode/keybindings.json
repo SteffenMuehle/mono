@@ -1,0 +1,287 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+shift+left",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "-workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+alt+b",
+        "command": "-workbench.action.toggleAuxiliaryBar"
+    },
+    {
+        "key": "ctrl+1",
+        "command": "workbench.action.focusSideBar"
+    },
+    {
+        "key": "ctrl+0",
+        "command": "-workbench.action.focusSideBar"
+    },
+    {
+        "key": "ctrl+shift+[Equal]",
+        "command": "-workbench.action.terminal.toggleTerminal",
+        "when": "terminal.active"
+    },
+    {
+        "key": "ctrl+3",
+        "command": "workbench.action.focusAuxiliaryBar"
+    },
+    {
+        "key": "ctrl+[Backquote]",
+        "command": "workbench.action.focusActivityBar"
+    },
+    {
+        "key": "ctrl+q",
+        "command": "-workbench.action.quit"
+    },
+    {
+        "key": "ctrl+shift+up",
+        "command": "workbench.files.action.collapseExplorerFolders"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "cursorWordAccessibilityLeft",
+        "when": "false"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "-cursorWordAccessibilityLeft",
+        "when": "accessibilityModeEnabled && isWindows && textInputFocus && focusedView == 'workbench.panel.output'"
+    },
+    {
+        "key": "alt+left",
+        "command": "cursorWordLeft",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "-cursorWordLeft",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "alt+right",
+        "command": "cursorWordEndRight",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+right",
+        "command": "-cursorWordEndRight",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+left",
+        "command": "cursorWordLeftSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "ctrl+shift+left",
+        "command": "-cursorWordLeftSelect",
+        "when": "textInputFocus"
+    },
+    {
+        "key": "shift+alt+right",
+        "command": "cursorWordRightSelect"
+    },
+    {
+        "key": "ctrl+backspace",
+        "command": "editor.action.deleteLines",
+        "when": "textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+shift+k",
+        "command": "-editor.action.deleteLines",
+        "when": "textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+shift+alt+down",
+        "command": "-editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "alt+pageup",
+        "command": "editor.action.insertCursorAbove",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+up",
+        "command": "-editor.action.insertCursorAbove",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+pagedown",
+        "command": "editor.action.insertCursorBelow",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+down",
+        "command": "-editor.action.insertCursorBelow",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+alt+[BracketRight]",
+        "command": "workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "ctrl+shift+-",
+        "command": "-workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "ctrl+right",
+        "command": "cursorLineEnd"
+    },
+    {
+        "key": "ctrl+left",
+        "command": "cursorLineStart"
+    },
+    {
+        "key": "alt+backspace",
+        "command": "deleteWordLeft",
+        "when": "textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+backspace",
+        "command": "-deleteWordLeft",
+        "when": "textInputFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "-workbench.action.terminal.resizePaneRight",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "key": "ctrl+shift+down",
+        "command": "workbench.view.scm",
+        "when": "workbench.scm.active"
+    },
+    {
+        "key": "ctrl+shift+g",
+        "command": "-workbench.view.scm",
+        "when": "workbench.scm.active"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "workbench.action.terminal.toggleTerminal"
+    },
+    {
+        "key": "ctrl+2",
+        "command": "workbench.files.action.focusOpenEditorsView",
+        "when": "workbench.explorer.openEditorsView.active"
+    },
+    {
+        "key": "ctrl+k e",
+        "command": "-workbench.files.action.focusOpenEditorsView",
+        "when": "workbench.explorer.openEditorsView.active"
+    },
+    {
+        "key": "ctrl+1",
+        "command": "-workbench.action.focusFirstEditorGroup"
+    },
+    {
+        "key": "ctrl+2",
+        "command": "workbench.action.focusActiveEditorGroup"
+    },
+    {
+        "key": "f1",
+        "command": "references-view.findReferences",
+        "when": "editorHasReferenceProvider"
+    },
+    {
+        "key": "shift+alt+f12",
+        "command": "-references-view.findReferences",
+        "when": "editorHasReferenceProvider"
+    },
+    {
+        "key": "f1",
+        "command": "-workbench.action.showCommands"
+    },
+    {
+        "key": "ctrl+shift+b",
+        "command": "gitlens.toggleFileBlame",
+        "when": "editorTextFocus && config.gitlens.keymap == 'chorded' && resource in 'gitlens:tabs:blameable'"
+    },
+    {
+        "key": "ctrl+shift+g b",
+        "command": "-gitlens.toggleFileBlame",
+        "when": "editorTextFocus && config.gitlens.keymap == 'chorded' && resource in 'gitlens:tabs:blameable'"
+    }
+    {
+        "key": "c c",
+        "command": "notebook.cell.copy",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "c",
+        "command": "-notebook.cell.copy",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "d d",
+        "command": "notebook.cell.delete",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "d d",
+        "command": "-notebook.cell.delete",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "x x",
+        "command": "notebook.cell.cut",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "x",
+        "command": "-notebook.cell.cut",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "v v",
+        "command": "notebook.cell.paste",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "v",
+        "command": "-notebook.cell.paste",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "z z",
+        "command": "undo",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "z",
+        "command": "-undo",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "b b",
+        "command": "notebook.cell.insertCodeCellBelowAndFocusContainer",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "b",
+        "command": "-notebook.cell.insertCodeCellBelowAndFocusContainer",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "ctrl+s ctrl+s",
+        "command": "notebook.cell.split",
+        "when": "editorTextFocus && inputFocus && notebookEditorFocused && !notebookOutputInputFocused"
+    },
+    {
+        "key": "ctrl+shift+-",
+        "command": "-notebook.cell.split",
+        "when": "editorTextFocus && inputFocus && notebookEditorFocused && !notebookOutputInputFocused"
+    }
+]
