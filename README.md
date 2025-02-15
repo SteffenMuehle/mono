@@ -1,27 +1,33 @@
-# Fresh "Debian Bookworm"
-On a different device, prepare a USB stick with a bootable ISO of Debian Bookworm
+we need:
+- new laptop, PC or VM
+- external data backup device
+- Wifi and its password
+- phone for
+    - Firefox password
+    - Github app for login 2FA
+
+# 1. Install OS
+On a different device, prepare a USB stick or SSD with a bootable ISO of OS
+
+## Pop-OS
+1. get display scaling right and deactivate HiDPI daemon (in display settings)
+2. always display battery percentage
+3. install gnome extension via browser to display workspace number
+4. customize OS keyboard shortcuts
 
 
-## 1. Sudo access
-su -
-    add user 'debian' to sudo users
-sudo apt update
-
-## 2. regolith
-
-1. install
-
-2. configure
+# 1. Copy data
 
 
-## 3. Firefox password access
+# 2. Firefox password access
 - open firefox
 - top-right: log in
+- get password from Phone.
 
 
-## 4. Github access
+# 3. Github access
 
-### SSH
+## SSH
 ```
 cd ~/.ssh
 ssh-keygen -t ed25519 -C "steffen_muehle@gmx.de"
@@ -35,7 +41,17 @@ In Firefox:
 - settings --> SSH and GPG keys
 - new SSH key
 
-### alternative: PAT
+```
+cd
+mkdir repos
+cd repos
+git clone git@github.com:SteffenMuehle/mono.git
+[ MAKE COMMIT, THEN FIRST TIME: ]
+git push -u origin main
+```
+
+
+## alternative: PAT
 > git config --global credential.helper store
 In Firefox:
 - log into github
@@ -43,8 +59,6 @@ In Firefox:
 - generate new token, copy it
 - do something in local git, it will ask user (=email) + password (enter token)
 
-
-## 5. Clone config repo
 ```
 cd
 mkdir repos
@@ -52,14 +66,8 @@ cd repos
 git clone https://github.com/SteffenMuehle/config
 ```
 
-## 6. Copy personal data from USB-stick
-- copy into `~/personal/data`
-1
 
 ## 7. Install programs
-
-### curl
-sudo apt install curl
 
 ### zsh
 ```
