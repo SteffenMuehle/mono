@@ -165,4 +165,15 @@ git clone https://github.com/SteffenMuehle/mono
 - vscode keybindings
 - calendar sync with debian
 - fitness: add 'runs' to csv
-- fitness: add CLI tool for adding entries to csv
+- fitness: add CLI tool for adding entries to csvtldr
+
+fzf
+
+eza
+
+ranger
+
+oh-my-posh
+https://ohmyposh.dev/docs/installation/prompt
+
+brew install zsh-history-substring-search  (https://github.com/zsh-users/zsh-history-substring-search)
