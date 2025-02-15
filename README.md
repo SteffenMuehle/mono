@@ -1,97 +1,168 @@
-## Installation guide
+# Fresh "Debian Bookworm"
+On a different device, prepare a USB stick with a bootable ISO of Debian Bookworm
 
-To set this repo up on your local machine, follow the following guide.
 
-### Install mise
-As a tool version manager, we use `mise`.
-Install it via
+## 1. Sudo access
+su -
+    add user 'debian' to sudo users
+sudo apt update
 
-```bash
-brew install mise
+## 2. regolith
+
+1. install
+
+2. configure
+
+
+## 3. Firefox password access
+- open firefox
+- top-right: log in
+
+
+## 4. Github access
+
+### SSH
+```
+cd ~/.ssh
+ssh-keygen -t ed25519 -C "steffen_muehle@gmx.de"
+cat id_ed25519.pub
+
+    [[COPY (including email)]]
 ```
 
-and then add its activation-step into your shell:
-```bash
-echo 'eval "$(mise activate zsh)"' >> ~/.zshrc
+In Firefox:
+- log into github
+- settings --> SSH and GPG keys
+- new SSH key
+
+### alternative: PAT
+> git config --global credential.helper store
+In Firefox:
+- log into github
+- settings --> developer settings --> Personal access tokens --> Tokens (classic)
+- generate new token, copy it
+- do something in local git, it will ask user (=email) + password (enter token)
+
+
+## 5. Clone config repo
+```
+cd
+mkdir repos
+cd repos
+git clone https://github.com/SteffenMuehle/config
 ```
 
-Now continue in a new shell session, or source your startup script:
-```bash
-source ~/.zshrc
-```
+## 6. Copy personal data from USB-stick
+- copy into `~/personal/data`
+1
 
-### Clone repo
-Move to the folder where you want to install this repo and clone it, i.e.:
-```bash
-cd ~/repos
+## 7. Install programs
+
+### curl
+sudo apt install curl
+
+### zsh
+```
+sudo apt install zsh
+chsh -s $(which zsh)
+```
+log out, log in
+
+oh my zsh
+
+### tldr
+sudo apt install tldr
+
+### eza
+https://github.com/eza-community/eza/blob/main/INSTALL.md:
+
+sudo mkdir -p /etc/apt/keyrings
+wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+sudo apt update
+sudo apt install -y eza
+
+
+
+install nerdfont:
+https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation
+download: https://www.nerdfonts.com/font-downloads
+> mkdir ~/.local/share/fonts
+> cp ~/Downloads/RobotoMono.zip ~/.local/share/fonts
+> cd ~/.local/share/fonts
+> unzip RobotoMono.zip
+> fc-cache -fv
+
+[needed on debian 12, not on ubuntu 24]
+add to file ~/.config/regolith3/Xresources:
+> gnome.terminal.font: RobotoMono Nerd Font 14
+
+add to vscode's settings.json:
+> "terminal.integrated.fontFamily": "'RobotoMono Nerd Font', 'Courier New', monospace",
+
+### fzf
+sudo apt install fzf
+
+### ranger
+sudo apt install ranger
+
+### vscode
+download .deb file from their website, then
+cd ~/Downloads
+sudo apt install ./code....
+
+
+### thunderbird
+> sudo apt install thunderbird
+- account setup: get email+pw from firefox
+- calendars: read in from `~/personal/data/calendar`
+
+datetime format yyyy-MM-dd:
+https://support.mozilla.org/en-US/kb/customize-date-time-formats-thunderbird
+
+get dark mode extension
+
+
+### mise
+https://mise.jdx.dev/installing-mise.html:
+
+apt update -y && apt install -y gpg sudo wget curl
+sudo install -dm 755 /etc/apt/keyrings
+wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
+sudo apt update
+sudo apt install -y mise
+
+
+https://github.com/asdf-community/asdf-python/issues/119:
+
+sudo apt install make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
+## hibernate
+https://ubuntuhandbook.org/index.php/2021/08/enable-hibernate-ubuntu-21-10/
+https://ubuntuhandbook.org/index.php/2020/05/lid-close-behavior-ubuntu-20-04/
+
+## german locale for date format ere nad there
+https://www.server-world.info/en/note?os=Ubuntu_24.04&p=locale
+
+## chatgpt desktop
+https://snapcraft.io/install/chatgpt-desktop/ubuntu
+
+## regolith config
+
+## 7. Set up monorepo
+```
 git clone https://github.com/SteffenMuehle/mono
 ```
 
-### Install tools via mise
 
-Mise is used to handle the used `Python` version, as well as the used `Poetry` version.
-Poetry is the Python package manager we use.
-The used versions of tools handled by mise are specified in the `.tool-versions` file.
-
-Make the specified versions available to Mise on your machine via moving to the repo and installing them like so:
-```bash
-mise install
-```
-
-This needs to be re-run whenever the version inside the `.tool-versions` file have been updated.
-To confirm that the tool versions have been added to your PATH variable you can run
-```bash
-echo $PATH | tr ":" "\n"
-```
-
-The first lines should look like `/Users/steffen.muehle/.local/share/mise/installs/python/3.12.4/bin`.
-
-### Configure poetry
-
-- Retrieve your artifactory API credentials from https://moiadev.jfrog.io/ui/user_profile and store them in your env variables `ARTIFACTORY_USER` and `ARTIFACTORY_APIKEY`.
-
-```bash
-poetry config virtualenvs.in-project true
-```
-
-### Install Python environment via poetry
-
-For each python package (subfolder of repository), we need to install the python dependencies onto your local machine
-in a virtual environment:
-
-```bash
-for folder in fitness; do
-    cd $folder
-    poetry install
-    cd ..
-done
-```
-
-### Run a notebook
-
-Jupyter notebooks in this repository are not checked into git as .ipynb files,
-but as .py files ("percent scripts"), see https://jupytext.readthedocs.io/en/latest/formats-scripts.html.
-The recommended workflow is:
-1. Locally convert the .py files into .ipynb (notebooks) via `cd optimizer` and `just notebook`
-2. Do your work in the .ipynb files and save them to disk
-3. Sync your changes to the .py file via `just notebook-sync`
-4. Commit your .py file
-5. The .ipynb is git-ignored, you can delete it if you want
-
-#### Open notebook via IDE (recommended)
-
-1. Vscode\
-Install the following extensions:
-- `Jupyter`
-
-and open the .ipynb files in vscode.
-
-When running a notebook for the first time, you need to select the correct Python interpreter for it. That should be the interpreter in the same package's `.venv/bin/python`.
-
-Each interpreter needs to be manually registered with vscode once. You can do this by
-- in the IDE's file tree, locate e.g. optimizer/.venv/bin/python
-- right click on it and copy its full path
-- open vscode's command palette (ctrl+shift+p, or View-->"Command Palette")
-- type/click on "Python: Select Interpreter", then "Enter interpreter path..."
-- paste the full path you copied and hit Enter.
-Now this Python interpreter should be choosable when clicking the opened notebooks top-right "Select Interpreter" button
+# todo
+- regolith autolaunch apps upon launch
+- .. and into dedicated workspace
+- vscode keybindings
+- calendar sync with debian
+- fitness: add 'runs' to csv
+- fitness: add CLI tool for adding entries to csv
