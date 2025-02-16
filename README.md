@@ -1,3 +1,8 @@
+# TODO
+set up minimal .zshrc for substring search shared
+https://askubuntu.com/questions/23630/how-do-you-share-history-between-terminals-in-zsh
+
+# Requirements
 we need:
 - new laptop, PC or VM
 - external data backup device
@@ -5,6 +10,7 @@ we need:
 - phone for
     - Firefox password
     - Github app for login 2FA
+    - coupling Signal app
 
 # 1. Install OS
 On a different device, prepare a USB stick or SSD with a bootable ISO of OS
@@ -67,121 +73,118 @@ git clone https://github.com/SteffenMuehle/config
 ```
 
 
-## 7. Install programs
+# 4. zsh, eza, gnome-tweaks, nerdfont
 
-### zsh
+## install zsh
 ```
 sudo apt install zsh
 chsh -s $(which zsh)
 ```
 log out, log in
 
-oh my zsh
+## install oh my zsh
+https://github.com/ohmyzsh/ohmyzsh/wiki
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-### tldr
-sudo apt install tldr
+## use custom .zshrc
+cp ~/repos/mono/config/shell/.zshrc ~
 
-### eza
+## eza
 https://github.com/eza-community/eza/blob/main/INSTALL.md:
 
+```
 sudo mkdir -p /etc/apt/keyrings
 wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
 echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
 sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 sudo apt update
-sudo apt install -y eza
+install -y eza
+```
 
+## gnome-tweaks
+> install gnome-tweaks
 
-
-install nerdfont:
+## nerd-fonts
 https://github.com/ryanoasis/nerd-fonts?tab=readme-ov-file#font-installation
 download: https://www.nerdfonts.com/font-downloads
-> mkdir ~/.local/share/fonts
-> cp ~/Downloads/RobotoMono.zip ~/.local/share/fonts
-> cd ~/.local/share/fonts
-> unzip RobotoMono.zip
-> fc-cache -fv
+```
+mkdir ~/.local/share/fonts
+cp ~/Downloads/RobotoMono.zip ~/.local/share/fonts
+cd ~/.local/share/fonts
+unzip RobotoMono.zip
+fc-cache -fv
+```
 
 [needed on debian 12, not on ubuntu 24]
 add to file ~/.config/regolith3/Xresources:
 > gnome.terminal.font: RobotoMono Nerd Font 14
 
+
+# german locale for date format
+maybe it was enough to go to "Settings > Date & Time", but I did
+> sudo locale-gen de_DE.UTF-8
+first.
+see also https://www.server-world.info/en/note?os=Ubuntu_24.04&p=locale
+
+
+# Install programs
+> install fzf
+> install ranger
+
+## code
+download .deb file from their website, then
+> cd ~/Downloads
+> install ./code....
+
 add to vscode's settings.json:
 > "terminal.integrated.fontFamily": "'RobotoMono Nerd Font', 'Courier New', monospace",
 
-### fzf
-sudo apt install fzf
 
-### ranger
-sudo apt install ranger
-
-### vscode
-download .deb file from their website, then
-cd ~/Downloads
-sudo apt install ./code....
-
-
-### thunderbird
-> sudo apt install thunderbird
+## thunderbird
+> install thunderbird
 - account setup: get email+pw from firefox
-- calendars: read in from `~/personal/data/calendar`
-
-datetime format yyyy-MM-dd:
-https://support.mozilla.org/en-US/kb/customize-date-time-formats-thunderbird
-
-get dark mode extension
+- date & time in German should already work
 
 
-### mise
+## mise
 https://mise.jdx.dev/installing-mise.html:
 
-apt update -y && apt install -y gpg sudo wget curl
+I had to run this twice:
+```
+sudo apt update -y && sudo apt install -y gpg sudo wget curl
 sudo install -dm 755 /etc/apt/keyrings
 wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
 echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
 sudo apt update
 sudo apt install -y mise
-
-
-https://github.com/asdf-community/asdf-python/issues/119:
-
-sudo apt install make build-essential libssl-dev zlib1g-dev \
-libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-
-## hibernate
-https://ubuntuhandbook.org/index.php/2021/08/enable-hibernate-ubuntu-21-10/
-https://ubuntuhandbook.org/index.php/2020/05/lid-close-behavior-ubuntu-20-04/
-
-## german locale for date format ere nad there
-https://www.server-world.info/en/note?os=Ubuntu_24.04&p=locale
-
-## chatgpt desktop
-https://snapcraft.io/install/chatgpt-desktop/ubuntu
-
-## regolith config
-
-## 7. Set up monorepo
-```
-git clone https://github.com/SteffenMuehle/mono
 ```
 
 
-# todo
-- regolith autolaunch apps upon launch
-- .. and into dedicated workspace
-- vscode keybindings
-- calendar sync with debian
-- fitness: add 'runs' to csv
-- fitness: add CLI tool for adding entries to csvtldr
+## Signal
+```
+# NOTE: These instructions only work for 64-bit Debian-based
+# Linux distributions such as Ubuntu, Mint etc.
 
-fzf
+# 1. Install our official public software signing key:
+wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg
+cat signal-desktop-keyring.gpg | sudo tee /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null
 
-eza
+# 2. Add our repository to your list of repositories:
+echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main' |\
+  sudo tee /etc/apt/sources.list.d/signal-xenial.list
 
-ranger
+# 3. Update your package database and install Signal:
+sudo apt update && sudo apt install signal-desktop
+```
 
-oh-my-posh
-https://ohmyposh.dev/docs/installation/prompt
 
-brew install zsh-history-substring-search  (https://github.com/zsh-users/zsh-history-substring-search)
+## Dropbox
+at website, download .deb installer
+cd Downloads && install ./dro.....
+
+
+## Obsidian
+at website, download .deb installer
+cd Downloads && install ./dro.....
+
+symlink Dropbox 'shared_resources' into ~/data/obsidian
