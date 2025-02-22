@@ -5,8 +5,6 @@ import os
 import csv
 from datetime import datetime
 from pathlib import Path
-import plotly.graph_objects as go
-from collections import defaultdict
 import numpy as np
 
 class Node:
