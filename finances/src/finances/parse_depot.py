@@ -34,7 +34,7 @@ def update_toml_from_csv(toml_file_path, csv_file_path):
                 display_entry = f"{display_name} ({inferred_id})"
                 if inferred_id in csv_data:
                     toml_data[key] = csv_data[inferred_id]
-                    if toml_data.get('autofreeze',False):
+                    if toml_data.get('freeze',False):
                         toml_data['target_amount'] = toml_data[key]
                     altered_entries.append(display_entry)
                     csv_ids.discard(inferred_id)  # Remove found ID from the set
