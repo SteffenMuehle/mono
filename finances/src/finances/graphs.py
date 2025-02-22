@@ -166,7 +166,7 @@ class Graph:
                     node.id,
                     color='black',
                     #weight=str(node.target_amount),
-                    label=(str(int(round(100*node.weight,ndigits=0)))+"%" if node.weight else "fixed") + " = " + str(int(round(node.target_amount,ndigits=0))),
+                    label=(str(int(round(100*node.weight,ndigits=0)))+"%" if not node.frozen else "fixed") + " = " + str(int(round(node.target_amount,ndigits=0))),
                     fontsize=str(int(curr_font_size)),
                 )
         return graph.render(output_path, format="png", cleanup=True)
