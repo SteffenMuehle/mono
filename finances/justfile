@@ -1,12 +1,12 @@
 start: fill monthly depot crypto graph
 fill:
-    poetry run python src/finances/fill_current_amounts.py
+    uv run python src/finances/fill_current_amounts.py
 monthly:
-    poetry run python src/finances/monthly_io.py
-    poetry run python src/finances/set_giro_target.py
+    uv run python src/finances/monthly_io.py
+    uv run python src/finances/set_giro_target.py
 depot:
-    poetry run python src/finances/parse_depot.py
+    uv run python src/finances/parse_depot.py
 crypto:
     bash src/finances/crypto.sh
 graph:
-    poetry run python src/finances/graphs.py
+    uv run python src/finances/graphs.py
