@@ -130,6 +130,8 @@ see also https://www.server-world.info/en/note?os=Ubuntu_24.04&p=locale
 # Install programs
 > install fzf
 > install ranger
+> install just
+> install graphviz
 
 ## code
 download .deb file from their website, then
