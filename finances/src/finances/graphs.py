@@ -226,7 +226,7 @@ class Graph:
                         parent=parent_id,
                         current_amount=val.get("current_amount", None),
                         target_amount=val.get("target_amount", None),
-                        weight=val.get("weight", None),
+                        weight=val.get("weight", 1.0),
                     )
                     nodes.append(cur_node)
                     nodes.extend(parse_nodes(val, parent_id=node_id))
