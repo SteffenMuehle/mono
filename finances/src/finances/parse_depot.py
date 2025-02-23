@@ -2,7 +2,7 @@ import csv
 import toml
 from pathlib import Path
 
-def update_toml_from_csv(toml_file_path, csv_file_path):
+def update_toml_from_csv(toml_file_path_in, toml_file_path_out, csv_file_path):
     # Read the CSV file and store the data in a dictionary
     csv_data = {}
     csv_ids = set()
@@ -15,7 +15,7 @@ def update_toml_from_csv(toml_file_path, csv_file_path):
             csv_ids.add(wkn)
 
     # Read the TOML file
-    toml_dict = toml.load(toml_file_path)
+    toml_dict = toml.load(toml_file_path_in)
 
     # Lists to keep track of altered and not found entries
     altered_entries = []
@@ -23,29 +23,35 @@ def update_toml_from_csv(toml_file_path, csv_file_path):
 
     # Function to recursively update the TOML data
     def update_toml(toml_data, parent_key=""):
-        for key, val in toml_data.items():
-            if isinstance(val, dict):
-                new_parent_key = f"{parent_key}.{key}" if parent_key else key
-                update_toml(val, new_parent_key)
-            elif key == 'current_amount':
-                # Infer the id from the parent_key
-                inferred_id = parent_key.split('.')[-1]
-                display_name = toml_data.get('print_name', inferred_id)
-                display_entry = f"{display_name} ({inferred_id})"
-                if inferred_id in csv_data:
-                    toml_data[key] = csv_data[inferred_id]
-                    if toml_data.get('freeze',False):
-                        toml_data['target_amount'] = toml_data[key]
-                    altered_entries.append(display_entry)
-                    csv_ids.discard(inferred_id)  # Remove found ID from the set
-                else:
-                    not_found_entries.append(display_entry)
+        # is bottom layer? if no dicts below, then yes:
+        more_dicts_below = any(isinstance(val, dict) for key, val in toml_data.items())
+        if more_dicts_below:
+            # If not bottom layer, then recurse
+            for key, val in toml_data.items():
+                if isinstance(val, dict):
+                    new_parent_key = f"{parent_key}.{key}" if parent_key else key
+                    update_toml(val, new_parent_key)
+        else:
+            # Infer the id from the parent_key
+            inferred_id = parent_key.split('.')[-1]
+            display_name = toml_data.get('print_name', inferred_id)
+            display_entry = f"{display_name} ({inferred_id})"
+            if inferred_id in csv_data:
+                toml_data['current_amount'] = csv_data[inferred_id]
+                if toml_data.get('freeze',False):
+                    toml_data['target_amount'] = toml_data['current_amount']
+                    # delete 'freeze' key
+                    del toml_data['freeze']
+                altered_entries.append(display_entry)
+                csv_ids.discard(inferred_id)  # Remove found ID from the set
+            else:
+                not_found_entries.append(display_entry)
 
     # Update the TOML data
     update_toml(toml_dict)
 
     # Write the updated TOML data back to the file
-    with open(toml_file_path, 'w') as toml_file:
+    with open(toml_file_path_out, 'w') as toml_file:
         toml.dump(toml_dict, toml_file)
 
     # Print the results
@@ -70,10 +76,10 @@ if __name__ == "__main__":
     print(f"Using most recent CSV file: {csv_file_path}")
 
     for toml_file_name in [
-        'investments.toml',
-        'elisa.toml',
+        'investments_manifest.toml',
+        'elisa_manifest.toml',
     ]:
         print("\n###############################################")
         print(f"Updating {toml_file_name} from {csv_file_path}")
-        update_toml_from_csv(relative_toml_folder_path / toml_file_name, csv_file_path)
+        update_toml_from_csv(relative_toml_folder_path / toml_file_name, relative_toml_folder_path / toml_file_name.replace("_manifest",""), csv_file_path)
         print("###############################################\n")
