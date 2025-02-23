@@ -73,6 +73,9 @@ git clone https://github.com/SteffenMuehle/config
 ```
 
 
+# 3.2 config git
+> cp ~/repos/mono/config/git/.gitconfig ~
+
 # 4. zsh, eza, gnome-tweaks, nerdfont
 
 ## install zsh
