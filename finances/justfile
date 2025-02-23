@@ -1,4 +1,4 @@
-start: fill monthly depot crypto graph
+run: fill monthly depot crypto graph
 fill:
     uv run python src/finances/fill_current_amounts.py
 monthly:
