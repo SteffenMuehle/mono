@@ -25,11 +25,15 @@ On a different device, prepare a USB stick or SSD with a bootable ISO of OS
 # 1. Copy data
 
 
-# 2. Firefox password access
+# 2. Firefox
+
+## 2.1 password access
 - open firefox
 - top-right: log in
 - get password from Phone.
 
+## 2.2 Adblocker
+ublock origin, just google it + install_button
 
 # 3. Github access
 
