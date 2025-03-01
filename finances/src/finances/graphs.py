@@ -169,6 +169,20 @@ class Graph:
                 )
         return graph.render(output_path, format="png", cleanup=True)
 
+    def to_markdown(self):
+        def _to_markdown_recursive(node_id: str, depth: int):
+            node = self._get_node(node_id)
+            children = self._get_children(node_id)
+            if not children:
+                return f"- {node.print_name} ({node.id}): {round(node.current_amount,2)}\n"
+            else:
+                return f"{'#'*(depth+1)} {node.print_name} (total: {round(node.current_amount,2)})\n" + "".join(
+                    [
+                        _to_markdown_recursive(child_id, depth+1)
+                        for child_id in children
+                    ]
+                )
+        return _to_markdown_recursive(self._get_root().id, 0)
 
     def absorb_graph(
         self,
@@ -239,6 +253,7 @@ class Graph:
 if __name__ == "__main__":
     input_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph"
     output_path = Path(__file__).parent.parent.parent / "data" / "output"
+    today = datetime.now().strftime("%Y-%m-%d")
 
     #read graphs
     base_graph = Graph.from_toml(input_path / "main.toml")
@@ -263,7 +278,10 @@ if __name__ == "__main__":
     )
 
     #plot result
-    base_graph.plot_graph(output_path / "graph") # inner function appends .png suffix
+    base_graph.plot_graph(output_path / today / "graph") # inner function appends .png suffix
 
     #save graph to csv
     base_graph.save_to_csv(output_path / "graph_history.csv")
+
+    #print markdown to stdout, terminal caller can pipe it into a file
+    print(base_graph.to_markdown())
