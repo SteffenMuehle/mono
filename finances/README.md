@@ -1,39 +1,20 @@
-# RUN MONTHLY on 25th, i.e. before salary comes in
+requirements:
+- laptop
+- phone+passwords for BLSK + ING app
 
-### 0. (OPTIONAL)
-
-##### 0.0 Review giro + visa + Paypal Umsaetze
-
-##### 0.1 reevaluate monthly grocery costs
-- `poetry run python src/finances/grocery_cost.py`
-- estimate monthly grocery costs basd on terminal output
-- update value in `input/io.monthly.out.groceries`.
-
-##### 0.1 review monthly expenses in io.toml
-- did any other fixed costs change?
-- `input/io.monthly.out.???`
-
-###### 0.2 add Liz contributions in io.toml
-- ask Wum if she wants to contribute. If so
-    - add to `input/io.transaction.Elizabeth_contribution_????`
-    - wait for money to show up in giro
-
-##### 0.3 add major expenses in io.toml
-`input/io.expense.????`
-
-
-### run:
-
-1. Transfer Verrechnungskonto to giro
-2. Transfer giro to visa if visa<0
-3. depot csv:
-    - log into https://www.comdirect.com
-    - go to depot
-    - download .csv file (`export as Excel format`)
-    - remove header and tail manually
-    - copy to `input/depot/`
-3. `just start`
-
-
-# RUN YEARLY AFTER NEW YEAR'S EVE
-- download Umsaetze in giro, verrechnung
+1. Log into http://www.comdirect.de
+    - move Verrechnungskonto to Giro
+    - pay off Visacard
+2. Log into http://www.paypal.com
+    - check diff to 500€, and send money from Comdirect to
+    - Empfänger: PayPal (Europe) S.a r.l. et Cie, S.C.A.
+    - IBAN: DE97 1207 0088 3037 1176 01
+3. Download depot csv in Comdirect, put into finances/data/input/depot, format csv manually
+4. Update finances/data/io.toml with major expenses and Liz contributions
+5. log into blsk.de
+6. log into ing.de
+7. `just clean`
+8. `just prompt`
+9. `just depot`
+10. `just graph`
+11. git commit stuff in finances/data repo
