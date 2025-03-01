@@ -1,12 +1,19 @@
-run: fill monthly depot crypto graph
-fill:
-    uv run python src/finances/fill_current_amounts.py
+prompt:
+    uv run python src/finances/prompt_current_amounts.py
+    bash src/finances/crypto.sh
+run: clean monthly depot graph
+clean:
+    #!/bin/sh
+    today=$(date +%Y-%m-%d)
+    echo "Creating fresh folder data/output/$today"
+    rm -rf data/output/$today/* && mkdir -p data/output/$today
 monthly:
-    uv run python src/finances/monthly_io.py
-    uv run python src/finances/set_giro_target.py
+    #!/bin/sh
+    today=$(date +%Y-%m-%d)
+    uv run python src/finances/evaluate_expenses.py >> data/output/$today/summary.md
 depot:
     uv run python src/finances/parse_depot.py
-crypto:
-    bash src/finances/crypto.sh
 graph:
-    uv run python src/finances/graphs.py
+    #!/bin/sh
+    today=$(date +%Y-%m-%d)
+    uv run python src/finances/graphs.py >> data/output/$today/summary.md
