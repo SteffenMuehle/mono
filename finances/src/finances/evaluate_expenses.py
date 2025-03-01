@@ -83,7 +83,7 @@ print(f"- Total major expenses of the last 2 years: {rolling_two_years_expenses_
 print(f"- Per month, that is {rolling_two_years_expenses_total/24:.2f}")
 print(f"- That amounts to {round(100 * percentage_used_by_major_expenses,2)}% of the monthly surplus.")
 print(f"- So, the effective monthly surplus is: {round(monthly_surplus * (1 - percentage_used_by_major_expenses),2)}")
-
+print("\n")
 
 
 # set target in giro
