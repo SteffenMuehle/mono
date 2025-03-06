@@ -57,6 +57,7 @@ alias install='sudo apt install'
 alias remove='sudo apt remove'
 alias click='xdg-open'
 alias hibernate='sudo systemctl hibernate'
+alias gcm='git commit -m'
 
 ########
 # PATH #
