@@ -1,0 +1,5 @@
+- iterm2
+    - https://coderwall.com/p/ds2dha/word-line-deletion-and-navigation-shortcuts-in-iterm2
+- rectangle
+- alttab
+- itsycal
