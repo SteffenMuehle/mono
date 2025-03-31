@@ -173,10 +173,11 @@ class Graph:
         def _to_markdown_recursive(node_id: str, depth: int):
             node = self._get_node(node_id)
             children = self._get_children(node_id)
+            indent = "  "*depth
             if not children:
-                return f"- {node.print_name} ({node.id}): {round(node.current_amount,2)}\n"
+                return indent + f"- {node.print_name} ({node.id}): {round(node.current_amount,2)}\n"
             else:
-                return f"{'#'*(depth+1)} {node.print_name} (total: {round(node.current_amount,2)})\n" + "".join(
+                return indent + f"- {node.print_name} (total: {round(node.current_amount,2)})\n" + "".join(
                     [
                         _to_markdown_recursive(child_id, depth+1)
                         for child_id in children
@@ -284,4 +285,5 @@ if __name__ == "__main__":
     base_graph.save_to_csv(output_path / "graph_history.csv")
 
     #print markdown to stdout, terminal caller can pipe it into a file
+    print("\n# Portfolio")
     print(base_graph.to_markdown())
