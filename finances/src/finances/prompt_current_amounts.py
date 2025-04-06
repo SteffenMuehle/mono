@@ -25,7 +25,7 @@ def fill_current_amounts(file_path):
     traverse_and_prompt(data)
     set_aside_savings(
         source_dict=data,
-        source_key="root.Steffen.savings.Comdirect",
+        source_key="root.Steffen.savings.ING",
         target_file_path=Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "set_aside.toml",
     )
     
@@ -50,9 +50,8 @@ def set_aside_savings(source_dict, source_key, target_file_path):
     for key,val in set_aside_dict.items():
         if not isinstance(val, dict):
             continue
-        amount_to_be_set_aside = val["target_amount"]
+        amount_to_be_set_aside = val["amount"]
         print(f"Setting aside {amount_to_be_set_aside} from savings source to {key}")
-        val["current_amount"] = amount_to_be_set_aside
         savings_source["current_amount"] -= amount_to_be_set_aside
     # data["current_amount"] = source_dict[source_key]["current_amount"]
     # with open(target_file_path, 'w') as f:
