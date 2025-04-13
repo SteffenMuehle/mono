@@ -1,5 +1,6 @@
 prompt:
     uv run python src/finances/prompt_current_amounts.py
+crypto:
     bash src/finances/crypto.sh
 run: clean monthly depot graph
 clean:
