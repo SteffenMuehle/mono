@@ -20,5 +20,6 @@ requirements:
 8. `just prompt`
 9. `just crypto`
 10. `just depot`
-11. `just graph`
-12. git commit stuff in finances/data repo
+11. `just monthly`
+12. `just graph`
+13. git commit stuff in finances/data repo
