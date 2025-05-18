@@ -16,6 +16,7 @@ def update_dict_from_csv(toml_dict, csv_file_path, bank):
     # Read the CSV file and store the data in a dictionary
     csv_data = {}
     csv_ids = set()
+    print(f"Reading CSV file: {csv_file_path}")
     with open(csv_file_path, mode='r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=';')
         for row in csv_reader:

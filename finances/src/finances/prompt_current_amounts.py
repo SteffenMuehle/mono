@@ -53,7 +53,6 @@ def set_aside_savings(source_dict, source_key, target_file_path):
 
     set_aside_dict = toml.load(target_file_path)["entries"]
     print(f"The target location for set aside savings is {target_file_path}.")
-    print(set_aside_dict)
     for key,val in set_aside_dict.items():
         if not isinstance(val, dict):
             continue
