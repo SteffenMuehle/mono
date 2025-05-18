@@ -3,7 +3,7 @@
 # Set locale to ensure dot (.) is used as the decimal separator
 export LC_NUMERIC="C"
 
-TOML_FILE="data/input/graph/crypto.toml"
+TOML_FILE="data/input/graph/crypto.md"
 
 while IFS= read -r line; do
     # Detect the start of a section, e.g., [stellar]

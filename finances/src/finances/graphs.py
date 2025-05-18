@@ -257,11 +257,11 @@ if __name__ == "__main__":
     today = datetime.now().strftime("%Y-%m-%d")
 
     #read graphs
-    base_graph = Graph.from_toml(input_path / "main.toml")
-    elisa_graph = Graph.from_toml(input_path / "elisa.toml")
-    set_aside_graph = Graph.from_toml(input_path / "set_aside.toml")
-    investment_graph = Graph.from_toml(input_path / "investments.toml")
-    crypto_graph = Graph.from_toml(input_path / "crypto.toml")
+    base_graph = Graph.from_toml(input_path / "main.md")
+    elisa_graph = Graph.from_toml(input_path / "elisa.md")
+    set_aside_graph = Graph.from_toml(input_path / "set_aside.md")
+    investment_graph = Graph.from_toml(input_path / "investments.md")
+    crypto_graph = Graph.from_toml(input_path / "crypto.md")
 
     #combine graphs
     base_graph.absorb_graph(elisa_graph)

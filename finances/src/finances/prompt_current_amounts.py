@@ -5,7 +5,7 @@ def fill_current_amounts(file_path):
     """
     prompt current_ammount values in leaf nodes of a toml file
     """
-    set_aside_file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "set_aside.toml"
+    set_aside_file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "set_aside.md"
     set_aside_dict = toml.load(set_aside_file_path)["entries"]
     set_aside_total_amount = sum([val["current_amount"] for key, val in set_aside_dict.items() if isinstance(val, dict)])
     def traverse_and_prompt(data, path=""):
@@ -63,7 +63,7 @@ def set_aside_savings(source_dict, source_key, target_file_path):
 
 if __name__ == "__main__":
     for file_name in [
-        "main.toml",
+        "main.md",
     ]:
         file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / file_name
         fill_current_amounts(file_path)

@@ -79,8 +79,8 @@ def update_dict_from_csv(toml_dict, csv_file_path, bank):
 if __name__ == "__main__":
     toml_folder_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph"
     for toml_file_name in [
-        'investments_manifest.toml',
-        'elisa_manifest.toml',
+        'investments_manifest.md',
+        'elisa_manifest.md',
     ]:
         # Read the TOML file
         print(f"Updating {toml_file_name}...")

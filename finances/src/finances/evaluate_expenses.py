@@ -5,7 +5,7 @@ from datetime import datetime
 TARGET_NUMBER_OF_MONTHLY_COSTS_IN_GIRO = 4
 
 relative_path = Path(__file__).parent.parent.parent / "data" / "input"
-io_toml_file_path = relative_path / "io.toml"
+io_toml_file_path = relative_path / "io.md"
 io = toml.load(io_toml_file_path)
 
 
@@ -87,7 +87,7 @@ print("\n")
 
 
 # set target in giro
-main_toml_file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "main.toml"
+main_toml_file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "main.md"
 main_dict = toml.load(main_toml_file_path)
 main_dict["root"]["Steffen"]["float"]["giro"]["target_amount"] = target_in_giro
 
