@@ -13,7 +13,7 @@ class Node:
         self,
         id: str,
         print_name: str | None = None,
-        parent: str | None = None,
+        parent_id: str | None = None,
         current_amount: float | None = None,
         target_amount: float | None = None,
         weight: float | None = None,
@@ -23,15 +23,15 @@ class Node:
             self.print_name = id
         else:
             self.print_name = print_name
-        self.parent = parent
-        self.children: list[Node] = []
+        self.parent_id = parent_id
+        self.children_ids: list[str] = []
         self.current_amount = current_amount
         self.target_amount = target_amount
         self.frozen = self.target_amount is not None
         self.weight = weight
 
     def __repr__(self):
-        return f"Node(id = '{self.id}', parent='{self.parent}', children='{self.children}'"
+        return f"Node(id = '{self.id}', parent_id='{self.parent_id}', children='{self.children_ids}'"
 
 
 class Graph:
@@ -39,33 +39,30 @@ class Graph:
         self,
         nodes: list[Node],
     ):
-        self.nodes = nodes
-        # fill in nodes' children
+        self.nodes_dict = {node.id: node for node in nodes}
         self._equilibrate()
+        assert all(key == val.id for key, val in self.nodes_dict.items())
 
-    def _find_children(self):
-        for node in self.nodes:
-            node.children = [other_node.id for other_node in self.nodes if other_node.parent == node.id]
+    def _assign_all_children_to_their_parents(self):
+        for this_id, this_node in self.nodes_dict.items():
+            this_node.children_ids = [other_id for other_id, other_node in self.nodes_dict.items() if other_node.parent_id == this_id]
 
     def __repr__(self):
-        return_str = "Graph(nodes=[\n"
-        for node in self.nodes:
-            return_str += f"{node},\n"
+        return_str = "Graph(node_ids=[\n"
+        for node_id in self.nodes_dict:
+            return_str += f"{node_id},\n"
         return_str += "])"
         return return_str
 
-    def _get_node(self, node_id: str) -> Node:
-        for node in self.nodes:
-            if node.id == node_id:
-                return node
-        raise ValueError(f"Node with id {node_id} not found")
+    def _get_node_by_id(self, node_id: str) -> Node:
+        return self.nodes_dict[node_id]
 
-    def _get_children(self, node_id: str) -> list[Node]:
-        node = self._get_node(node_id)
-        return node.children
+    def _get_children_of_node_by_id(self, parent_node_id: str) -> list[Node]:
+        parent_node = self._get_node_by_id(parent_node_id)
+        return [self._get_node_by_id(child_id) for child_id in parent_node.children_ids]
 
-    def _get_root(self) -> Node:
-        roots = [node for node in self.nodes if node.parent is None]
+    def _get_root_of_graph(self) -> Node:
+        roots = [node for node in self.nodes if node.parent_id is None]
         num_roots = len(roots)
         if num_roots == 0:
             raise ValueError("No root nodes found")
@@ -77,61 +74,64 @@ class Graph:
         return [node for node in self.nodes if not node.children]
 
     def _propagate_current_amounts_up(self):
-        def _get_amount(node_id: str) -> float:
-            children = self._get_children(node_id)
+        def _get_current_amount_by_id(node_id: str) -> float:
+            children = self._get_children_of_node_by_id(node_id)
             if not children:
-                to_return = self._get_node(node_id).current_amount
+                to_return = self._get_node_by_id(node_id).current_amount
             else:
-                to_return = sum([_get_amount(child_id) for child_id in children])
-                self._get_node(node_id).current_amount = to_return
+                to_return = sum([_get_current_amount_by_id(child.id) for child in children])
+                self._get_node_by_id(node_id).current_amount = to_return
             return to_return
 
-        _get_amount(self._get_root().id)
+        _get_current_amount_by_id(self._get_root_of_graph().id)
 
     def _propagate_target_amounts_down(self):
-        root_node = self._get_root()
+        root_node = self._get_root_of_graph()
         root_node.target_amount = root_node.current_amount
-        current_parents = [root_node.id]
-        while current_parents:
-            new_parents = []
-            for parent_id in current_parents:
-                parent_node = self._get_node(parent_id)
-                target_amount = parent_node.target_amount
-                children = self._get_children(parent_id)
+        current_parent_ids = [root_node.id]
+        while current_parent_ids:
+            new_parent_ids = []
+            for parent_id in current_parent_ids:
+                parent_node = self._get_node_by_id(parent_id)
+                amount_to_inherit = parent_node.target_amount
+                children = self._get_children_of_node_by_id(parent_id)
                 if not children:
                     continue
 
-                # remove frozen children's target_amount from target_amount
-                frozen_children = [child_id for child_id in children if self._get_node(child_id).frozen]
-                frozen_amount = sum([self._get_node(child_id).target_amount for child_id in frozen_children])
-                target_amount -= frozen_amount
+                # frozen children just keep their target_amount and don't further inherit from parent:
+                # remove frozen children's target_amount from parent's inheritable amount
+                frozen_children = [child for child in children if child.frozen]
+                if frozen_children:
+                    frozen_target_amount = sum([child.target_amount for child in frozen_children])
+                    amount_to_inherit -= frozen_target_amount
 
                 # distribute remaining target_amount to remaining children
-                remaining_children = [child_id for child_id in children if not self._get_node(child_id).frozen]
-                combined_weight = sum([self._get_node(child_id).weight for child_id in remaining_children])
-                for child_id in remaining_children:
-                    child_node = self._get_node(child_id)
-                    child_node.target_amount = target_amount * child_node.weight / combined_weight
-                    new_parents.append(child_id)
-            current_parents = new_parents
+                inheritting_children = [child for child in children if not child.frozen]
+                combined_weight = sum([child.weight for child in inheritting_children])
+                for child in inheritting_children:
+                    child.target_amount = amount_to_inherit * child.weight / combined_weight
+                    new_parent_ids.append(child.id)
+            current_parent_ids = new_parent_ids
 
     def _propagate_frozen_status_up_one_step(self):
-        for node in self.nodes:
-            children = self._get_children(node.id)
-            if children and all([self._get_node(child_id).frozen for child_id in children]):
-                node.target_amount = sum([self._get_node(child_id).target_amount for child_id in children])
+        for node_id, node in self.nodes.items():
+            children = self._get_children_of_node_by_id(node_id)
+            if children and all([child.frozen for child in children]):
+                node.target_amount = sum([child.target_amount for child in children])
                 node.frozen = True
 
     def _propagate_frozen_status_up(self):
+        def _num_frozen_nodes_in_graph(self):
+            return sum([node.frozen for _, node in self.nodes.items()])
         num_frozen_nodes_before = 0
-        num_frozen_nodes_after = sum([node.frozen for node in self.nodes])
+        num_frozen_nodes_after = _num_frozen_nodes_in_graph(self)
         while num_frozen_nodes_before != num_frozen_nodes_after:
             num_frozen_nodes_before = num_frozen_nodes_after
             self._propagate_frozen_status_up_one_step()
-            num_frozen_nodes_after = sum([node.frozen for node in self.nodes])
+            num_frozen_nodes_after = _num_frozen_nodes_in_graph(self)
 
     def _equilibrate(self):
-        self._find_children()
+        self._assign_all_children_to_their_parents()
         self._propagate_current_amounts_up()
         self._propagate_frozen_status_up()
         self._propagate_target_amounts_down()
@@ -139,7 +139,7 @@ class Graph:
     def plot_graph(self, output_path: str = "graph.svg"):
         graph = Digraph()
 
-        total_amount = self._get_root().current_amount
+        total_amount = self._get_root_of_graph().current_amount
         min_font_size = 8
         max_font_size = 16
         for node in self.nodes:
@@ -172,8 +172,8 @@ class Graph:
 
     def to_markdown(self):
         def _to_markdown_recursive(node_id: str, depth: int):
-            node = self._get_node(node_id)
-            children = self._get_children(node_id)
+            node = self._get_node_by_id(node_id)
+            children = self._get_children_of_node_by_id(node_id)
             indent = "  " * depth
             if not children:
                 return indent + f"- {node.print_name} ({node.id}): {round(node.current_amount, 2)}\n"
@@ -181,10 +181,10 @@ class Graph:
                 return (
                     indent
                     + f"- {node.print_name} (total: {round(node.current_amount, 2)})\n"
-                    + "".join([_to_markdown_recursive(child_id, depth + 1) for child_id in children])
+                    + "".join([_to_markdown_recursive(child.id, depth + 1) for child in children])
                 )
 
-        return _to_markdown_recursive(self._get_root().id, 0)
+        return _to_markdown_recursive(self._get_root_of_graph().id, 0)
 
     def absorb_graph(
         self,
@@ -194,7 +194,7 @@ class Graph:
         sub_root_id = graph_that_is_absorbed._get_root().id
 
         self.nodes += graph_that_is_absorbed.nodes
-        self._get_node(sub_root_id).parent = node_id_to_attach_to
+        self._get_node_by_id(sub_root_id).parent_id = node_id_to_attach_to
         self._equilibrate()
 
     def save_to_csv(
@@ -236,7 +236,7 @@ class Graph:
                     cur_node = Node(
                         id=node_id,
                         print_name=val.get("print_name", None),
-                        parent=parent_id,
+                        parent_id=parent_id,
                         current_amount=val.get("current_amount", None),
                         target_amount=val.get("target_amount", None),
                         weight=val.get("weight", 1.0),
