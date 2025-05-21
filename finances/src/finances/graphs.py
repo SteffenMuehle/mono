@@ -16,19 +16,20 @@ class Node:
         parent_id: str | None = None,
         current_amount: float | None = None,
         target_amount: float | None = None,
-        weight: float | None = None,
+        inheritance_weight: float | None = None,
     ):
         self.id = id
-        if print_name is None:
-            self.print_name = id
-        else:
-            self.print_name = print_name
+        self.print_name = print_name if print_name is not None else id
         self.parent_id = parent_id
-        self.children_ids: list[str] = []
         self.current_amount = current_amount
         self.target_amount = target_amount
-        self.frozen = self.target_amount is not None
-        self.weight = weight
+        self.inheritance_weight = inheritance_weight
+        self.children_ids: list[str] = []
+        self.plotcolor = "orange"  # default color for non-frozen nodes
+
+    @property
+    def frozen(self) -> bool:
+        return self.target_amount is not None
 
     def __repr__(self):
         return f"Node(id = '{self.id}', parent_id='{self.parent_id}', children='{self.children_ids}'"
@@ -40,12 +41,12 @@ class Graph:
         nodes: list[Node],
     ):
         self.nodes_dict = {node.id: node for node in nodes}
-        self._equilibrate()
-        assert all(key == val.id for key, val in self.nodes_dict.items())
 
     def _assign_all_children_to_their_parents(self):
         for this_id, this_node in self.nodes_dict.items():
-            this_node.children_ids = [other_id for other_id, other_node in self.nodes_dict.items() if other_node.parent_id == this_id]
+            this_node.children_ids = [
+                other_id for other_id, other_node in self.nodes_dict.items() if other_node.parent_id == this_id
+            ]
 
     def __repr__(self):
         return_str = "Graph(node_ids=[\n"
@@ -62,7 +63,7 @@ class Graph:
         return [self._get_node_by_id(child_id) for child_id in parent_node.children_ids]
 
     def _get_root_of_graph(self) -> Node:
-        roots = [node for node in self.nodes if node.parent_id is None]
+        roots = [node for _, node in self.nodes_dict.items() if node.parent_id == "root"]
         num_roots = len(roots)
         if num_roots == 0:
             raise ValueError("No root nodes found")
@@ -70,18 +71,22 @@ class Graph:
             raise ValueError("Multiple root nodes found")
         return roots[0]
 
-    def _get_leaves(self) -> list[Node]:
-        return [node for node in self.nodes if not node.children]
-
     def _propagate_current_amounts_up(self):
         def _get_current_amount_by_id(node_id: str) -> float:
             children = self._get_children_of_node_by_id(node_id)
+            node = self._get_node_by_id(node_id)
             if not children:
-                to_return = self._get_node_by_id(node_id).current_amount
+                to_return = node.current_amount
             else:
                 to_return = sum([_get_current_amount_by_id(child.id) for child in children])
-                self._get_node_by_id(node_id).current_amount = to_return
-            return to_return
+                if node.current_amount is not None:
+                    raise ValueError(
+                        f"Node {node_id} has a current_amount set ({node.current_amount}) but also has children ({children}) with total current amount {to_return}."
+                        "This is not allowed, as it would be ambiguous how to propagate the current_amount up."
+                    )
+                else:
+                    node.current_amount = to_return
+            return to_return  # type: ignore
 
         _get_current_amount_by_id(self._get_root_of_graph().id)
 
@@ -107,22 +112,22 @@ class Graph:
 
                 # distribute remaining target_amount to remaining children
                 inheritting_children = [child for child in children if not child.frozen]
-                combined_weight = sum([child.weight for child in inheritting_children])
+                combined_weight = sum([child.inheritance_weight for child in inheritting_children])
                 for child in inheritting_children:
-                    child.target_amount = amount_to_inherit * child.weight / combined_weight
+                    child.target_amount = amount_to_inherit * child.inheritance_weight / combined_weight
                     new_parent_ids.append(child.id)
             current_parent_ids = new_parent_ids
 
     def _propagate_frozen_status_up_one_step(self):
-        for node_id, node in self.nodes.items():
+        for node_id, node in self.nodes_dict.items():
             children = self._get_children_of_node_by_id(node_id)
             if children and all([child.frozen for child in children]):
                 node.target_amount = sum([child.target_amount for child in children])
-                node.frozen = True
 
     def _propagate_frozen_status_up(self):
         def _num_frozen_nodes_in_graph(self):
-            return sum([node.frozen for _, node in self.nodes.items()])
+            return sum([node.frozen for _, node in self.nodes_dict.items()])
+
         num_frozen_nodes_before = 0
         num_frozen_nodes_after = _num_frozen_nodes_in_graph(self)
         while num_frozen_nodes_before != num_frozen_nodes_after:
@@ -130,42 +135,84 @@ class Graph:
             self._propagate_frozen_status_up_one_step()
             num_frozen_nodes_after = _num_frozen_nodes_in_graph(self)
 
-    def _equilibrate(self):
+    def _check_validity_of_nodes(self):
+        for node_id, node in self.nodes_dict.items():
+            if node.parent_id == "root":
+                if node.inheritance_weight is not None:
+                    raise ValueError(f"root node {node_id} cannot have a weight set, as it has noone to inherit from.")
+            elif node.frozen:
+                if node.inheritance_weight is not None:
+                    raise ValueError(
+                        f"Node {node_id} has a target_amount ({node.target_amount}) set."
+                        f"Thus it will not inherit from its parent ({node.parent_id}) and we don't its weight to be set but it is {node.inheritance_weight}."
+                    )
+            elif node.inheritance_weight is None:
+                raise ValueError(
+                    f"Node {node_id} is not frozen and is expected to inherit from its parent ({node.parent_id}) but has no weight set."
+                    f"Please set the weight to a value between 0 and 1."
+                )
+            elif node.inheritance_weight < 0 or node.inheritance_weight > 1:
+                raise ValueError(f"Node {node_id} has a weight set ({node.inheritance_weight}) but it is not in [0,1].")
+
+    def _fixate_plotcolors(self):
+        for _, node in self.nodes_dict.items():
+            if node.frozen:
+                node.plotcolor = "lightblue"
+            else:
+                node.plotcolor = "orange"
+            if node.parent_id == "root":
+                node.plotcolor = "lightgreen"
+            elif node.parent_id == "disconnected":
+                node.plotcolor = "red"
+
+    def equilibrate(self):
         self._assign_all_children_to_their_parents()
-        self._propagate_current_amounts_up()
         self._propagate_frozen_status_up()
+        self._check_validity_of_nodes()
+        self._propagate_current_amounts_up()
+        self._fixate_plotcolors()
         self._propagate_target_amounts_down()
 
     def plot_graph(self, output_path: str = "graph.svg"):
         graph = Digraph()
 
         total_amount = self._get_root_of_graph().current_amount
+        if total_amount is None:
+            raise ValueError("Root node has no current_amount set.")
         min_font_size = 8
         max_font_size = 16
-        for node in self.nodes:
-            color = "lightblue" if node.frozen else "orange"
+        for _, node in self.nodes_dict.items():
+            current_amount = node.current_amount
+            if current_amount is None:
+                raise ValueError(f"Node {node.id} has no current_amount set.")
+            target_amount = node.target_amount
+            if target_amount is None:
+                raise ValueError(f"Node {node.id} has no target_amount set.")
             # Customize node appearance
             graph.node(
                 node.id,
-                label=node.print_name + f"\n {int(round(node.current_amount, ndigits=0))}",
+                label=node.print_name + f"\n {int(round(current_amount, ndigits=0))}",  # type: ignore
                 shape="box",
                 style="filled",
-                color=color,
+                color=node.plotcolor,
                 fontname="Helvetica",
                 fontsize="10",
             )
-            if node.parent:
-                fraction = node.current_amount / total_amount
+            if node.parent_id and node.parent_id not in ["root", "disconnected"]:
+                fraction = current_amount / total_amount
                 curr_font_size = max(min_font_size, max_font_size * np.sqrt(fraction))
                 # Customize edge appearance
                 graph.edge(
-                    node.parent,
+                    node.parent_id,
                     node.id,
                     color="black",
-                    # weight=str(node.target_amount),
-                    label=(str(int(round(100 * node.weight, ndigits=0))) + "%" if not node.frozen else "fixed")
+                    label=(
+                        str(int(round(100 * node.inheritance_weight, ndigits=0))) + "%"  # type: ignore
+                        if node.plotcolor == "orange"
+                        else "fixed"
+                    )
                     + " = "
-                    + str(int(round(node.target_amount, ndigits=0))),
+                    + str(int(round(target_amount, ndigits=0))),
                     fontsize=str(int(curr_font_size)),
                 )
         return graph.render(output_path, format="png", cleanup=True)
@@ -176,11 +223,11 @@ class Graph:
             children = self._get_children_of_node_by_id(node_id)
             indent = "  " * depth
             if not children:
-                return indent + f"- {node.print_name} ({node.id}): {round(node.current_amount, 2)}\n"
+                return indent + f"- {node.print_name} ({node.id}): {round(node.current_amount, 2)}\n"  # type: ignore
             else:
                 return (
                     indent
-                    + f"- {node.print_name} (total: {round(node.current_amount, 2)})\n"
+                    + f"- {node.print_name} (total: {round(node.current_amount, 2)})\n"  # type: ignore
                     + "".join([_to_markdown_recursive(child.id, depth + 1) for child in children])
                 )
 
@@ -188,14 +235,13 @@ class Graph:
 
     def absorb_graph(
         self,
-        graph_that_is_absorbed,
-        node_id_to_attach_to: str = "",
+        graph_that_is_absorbed: "Graph",
+        node_id_to_attach_to: str = "disconnected",
     ):
-        sub_root_id = graph_that_is_absorbed._get_root().id
+        sub_root_id = graph_that_is_absorbed._get_root_of_graph().id
 
-        self.nodes += graph_that_is_absorbed.nodes
+        self.nodes_dict |= graph_that_is_absorbed.nodes_dict
         self._get_node_by_id(sub_root_id).parent_id = node_id_to_attach_to
-        self._equilibrate()
 
     def save_to_csv(
         self,
@@ -215,20 +261,20 @@ class Graph:
             writer = csv.DictWriter(file, fieldnames=csv_columns)
             if not file_exists:
                 writer.writeheader()
-            for node in self.nodes:
+            for _, node in self.nodes_dict.items():
                 writer.writerow(
                     {
                         "id": node.id,
                         "print_name": node.print_name,
                         "date": datetime.now().strftime("%Y-%m-%d"),
-                        "current_amount": round(node.current_amount, 2),
-                        "target_amount": round(node.target_amount, 2),
+                        "current_amount": round(node.current_amount, 2),  # type: ignore
+                        "target_amount": round(node.target_amount, 2),  # type: ignore
                     }
                 )
 
     @classmethod
-    def from_toml(cls, toml_path: str):
-        def parse_nodes(data, parent_id=None):
+    def from_toml(cls, toml_path: Path):
+        def parse_nodes(data, parent_id="root"):
             nodes = []
             for key, val in data.items():
                 if isinstance(val, dict):
@@ -239,7 +285,7 @@ class Graph:
                         parent_id=parent_id,
                         current_amount=val.get("current_amount", None),
                         target_amount=val.get("target_amount", None),
-                        weight=val.get("weight", 1.0),
+                        inheritance_weight=val.get("weight", None),
                     )
                     nodes.append(cur_node)
                     nodes.extend(parse_nodes(val, parent_id=node_id))
@@ -268,16 +314,17 @@ if __name__ == "__main__":
     base_graph.absorb_graph(elisa_graph)
     base_graph.absorb_graph(
         set_aside_graph,
-        node_id_to_attach_to="root",
-    )
-    base_graph.absorb_graph(
-        crypto_graph,
-        node_id_to_attach_to="root",
+        node_id_to_attach_to="total",
     )
     base_graph.absorb_graph(
         investment_graph,
         node_id_to_attach_to="Steffen",
     )
+    base_graph.absorb_graph(
+        crypto_graph,
+        node_id_to_attach_to="investments",
+    )
+    base_graph.equilibrate()
 
     # plot result
     base_graph.plot_graph(output_path / today / "graph")  # inner function appends .png suffix

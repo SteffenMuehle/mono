@@ -48,10 +48,11 @@ def update_dict_from_csv(toml_dict, csv_file_path, bank):
             display_entry = f"{display_name} ({inferred_id})"
             if inferred_id in csv_data:
                 toml_data["current_amount"] = csv_data[inferred_id]
-                if toml_data.get("freeze", False):
+                if toml_data.get("keep_as_is", False):
                     toml_data["target_amount"] = toml_data["current_amount"]
-                    # delete 'freeze' key
-                    del toml_data["freeze"]
+                    # 'keep_as_is' is used to translate from '_manifest.toml' to '.toml'
+                    # but graph.py uses only 'current_amount' and 'target_amount'
+                    del toml_data["keep_as_is"]
                 altered_entries.append(display_entry)
                 csv_ids.discard(inferred_id)  # Remove found ID from the set
             else:
