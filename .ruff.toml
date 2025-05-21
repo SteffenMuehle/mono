@@ -1,0 +1,18 @@
+line-length = 120
+
+[lint]
+# https://docs.astral.sh/ruff/linter/#rule-selection
+extend-select = [
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+ignore = [
+    # useless expression, common pattern used in pypercent notebook files
+    "B018",
+]

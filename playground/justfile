@@ -1,0 +1,29 @@
+@default: fmt lint test
+
+fmt: lint-ruff-format-fix lint-ruff-check-fix
+
+lint: lint-ruff-format-nofix lint-ruff-check-nofix lint-mypy
+
+test:
+    uv run -- pytest .
+
+lint-ruff-format-fix:
+    uv run -- ruff format src tests notebooks
+
+lint-ruff-check-fix:
+    uv run -- ruff check --fix src tests notebooks
+
+lint-mypy:
+    uv run -- mypy --config-file=../.mypy.ini src tests
+
+lint-ruff-format-nofix:
+    uv run -- ruff format --check src tests notebooks
+
+lint-ruff-check-nofix:
+    uv run -- ruff check src tests notebooks
+
+py-to-nb target:
+    uv run -- jupytext --to notebook "{{target}}"
+
+nb-to-py target:
+    uv run -- jupytext --to py:percent "{{target}}"

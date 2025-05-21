@@ -7,12 +7,13 @@ app = marimo.App(width="medium")
 @app.cell
 def __():
     import marimo as mo
+
     return (mo,)
 
 
 @app.cell
 def __():
-    x=2
+    x = 2
     return (x,)
 
 

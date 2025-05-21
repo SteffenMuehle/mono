@@ -1,0 +1,20 @@
+[project]
+name = "mono"
+version = "0.1.0"
+description = "Workspace root"
+readme = "README.md"
+requires-python = ">=3.13"
+
+[tool.uv.workspace]
+members = [
+    "playground",
+    "llm-chat",
+    "finances",
+    "fitness",    
+]
+
+[tool.uv.sources]
+playground = { workspace = true }
+llm-chat = { workspace = true }
+finances = { workspace = true }
+fitness = { workspace = true }

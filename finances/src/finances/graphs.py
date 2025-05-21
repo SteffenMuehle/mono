@@ -1,21 +1,22 @@
-from typing import Optional
-from graphviz import Digraph
-import toml
-import os
 import csv
+import os
 from datetime import datetime
 from pathlib import Path
+
 import numpy as np
+import toml
+from graphviz import Digraph
+
 
 class Node:
     def __init__(
         self,
         id: str,
-        print_name: Optional[str] = None,
-        parent: Optional[str] = None,
-        current_amount: Optional[float] = None,
-        target_amount: Optional[float] = None,
-        weight: Optional[float] = None,
+        print_name: str | None = None,
+        parent: str | None = None,
+        current_amount: float | None = None,
+        target_amount: float | None = None,
+        weight: float | None = None,
     ):
         self.id = id
         if print_name is None:
@@ -23,7 +24,7 @@ class Node:
         else:
             self.print_name = print_name
         self.parent = parent
-        self.children = None
+        self.children: list[Node] = []
         self.current_amount = current_amount
         self.target_amount = target_amount
         self.frozen = self.target_amount is not None
@@ -45,7 +46,6 @@ class Graph:
     def _find_children(self):
         for node in self.nodes:
             node.children = [other_node.id for other_node in self.nodes if other_node.parent == node.id]
-
 
     def __repr__(self):
         return_str = "Graph(nodes=[\n"
@@ -75,18 +75,17 @@ class Graph:
 
     def _get_leaves(self) -> list[Node]:
         return [node for node in self.nodes if not node.children]
-    
+
     def _propagate_current_amounts_up(self):
         def _get_amount(node_id: str) -> float:
             children = self._get_children(node_id)
             if not children:
                 to_return = self._get_node(node_id).current_amount
             else:
-                to_return = sum(
-                    [_get_amount(child_id) for child_id in children]
-                )
+                to_return = sum([_get_amount(child_id) for child_id in children])
                 self._get_node(node_id).current_amount = to_return
             return to_return
+
         _get_amount(self._get_root().id)
 
     def _propagate_target_amounts_down(self):
@@ -115,7 +114,7 @@ class Graph:
                     child_node.target_amount = target_amount * child_node.weight / combined_weight
                     new_parents.append(child_id)
             current_parents = new_parents
-        
+
     def _propagate_frozen_status_up_one_step(self):
         for node in self.nodes:
             children = self._get_children(node.id)
@@ -129,14 +128,14 @@ class Graph:
         while num_frozen_nodes_before != num_frozen_nodes_after:
             num_frozen_nodes_before = num_frozen_nodes_after
             self._propagate_frozen_status_up_one_step()
-            num_frozen_nodes_after = sum([node.frozen for node in self.nodes]) 
+            num_frozen_nodes_after = sum([node.frozen for node in self.nodes])
 
     def _equilibrate(self):
         self._find_children()
         self._propagate_current_amounts_up()
         self._propagate_frozen_status_up()
-        self._propagate_target_amounts_down()      
-    
+        self._propagate_target_amounts_down()
+
     def plot_graph(self, output_path: str = "graph.svg"):
         graph = Digraph()
 
@@ -144,16 +143,16 @@ class Graph:
         min_font_size = 8
         max_font_size = 16
         for node in self.nodes:
-            color = 'lightblue' if node.frozen else 'orange'
+            color = "lightblue" if node.frozen else "orange"
             # Customize node appearance
             graph.node(
                 node.id,
-                label=node.print_name + f"\n {int(round(node.current_amount,ndigits=0))}",
-                shape='box',
-                style='filled',
+                label=node.print_name + f"\n {int(round(node.current_amount, ndigits=0))}",
+                shape="box",
+                style="filled",
                 color=color,
-                fontname='Helvetica',
-                fontsize='10',
+                fontname="Helvetica",
+                fontsize="10",
             )
             if node.parent:
                 fraction = node.current_amount / total_amount
@@ -162,9 +161,11 @@ class Graph:
                 graph.edge(
                     node.parent,
                     node.id,
-                    color='black',
-                    #weight=str(node.target_amount),
-                    label=(str(int(round(100*node.weight,ndigits=0)))+"%" if not node.frozen else "fixed") + " = " + str(int(round(node.target_amount,ndigits=0))),
+                    color="black",
+                    # weight=str(node.target_amount),
+                    label=(str(int(round(100 * node.weight, ndigits=0))) + "%" if not node.frozen else "fixed")
+                    + " = "
+                    + str(int(round(node.target_amount, ndigits=0))),
                     fontsize=str(int(curr_font_size)),
                 )
         return graph.render(output_path, format="png", cleanup=True)
@@ -173,16 +174,16 @@ class Graph:
         def _to_markdown_recursive(node_id: str, depth: int):
             node = self._get_node(node_id)
             children = self._get_children(node_id)
-            indent = "  "*depth
+            indent = "  " * depth
             if not children:
-                return indent + f"- {node.print_name} ({node.id}): {round(node.current_amount,2)}\n"
+                return indent + f"- {node.print_name} ({node.id}): {round(node.current_amount, 2)}\n"
             else:
-                return indent + f"- {node.print_name} (total: {round(node.current_amount,2)})\n" + "".join(
-                    [
-                        _to_markdown_recursive(child_id, depth+1)
-                        for child_id in children
-                    ]
+                return (
+                    indent
+                    + f"- {node.print_name} (total: {round(node.current_amount, 2)})\n"
+                    + "".join([_to_markdown_recursive(child_id, depth + 1) for child_id in children])
                 )
+
         return _to_markdown_recursive(self._get_root().id, 0)
 
     def absorb_graph(
@@ -195,7 +196,6 @@ class Graph:
         self.nodes += graph_that_is_absorbed.nodes
         self._get_node(sub_root_id).parent = node_id_to_attach_to
         self._equilibrate()
-
 
     def save_to_csv(
         self,
@@ -221,18 +221,18 @@ class Graph:
                         "id": node.id,
                         "print_name": node.print_name,
                         "date": datetime.now().strftime("%Y-%m-%d"),
-                        "current_amount": round(node.current_amount,2),
-                        "target_amount": round(node.target_amount,2),
+                        "current_amount": round(node.current_amount, 2),
+                        "target_amount": round(node.target_amount, 2),
                     }
                 )
-    
+
     @classmethod
     def from_toml(cls, toml_path: str):
         def parse_nodes(data, parent_id=None):
             nodes = []
             for key, val in data.items():
                 if isinstance(val, dict):
-                    node_id = key.split('.')[-1]
+                    node_id = key.split(".")[-1]
                     cur_node = Node(
                         id=node_id,
                         print_name=val.get("print_name", None),
@@ -245,25 +245,26 @@ class Graph:
                     nodes.extend(parse_nodes(val, parent_id=node_id))
             return nodes
 
-        with open(toml_path, "r") as file:
+        with open(toml_path) as file:
             data = toml.load(file)
 
         nodes = parse_nodes(data)
         return cls(nodes=nodes)
+
 
 if __name__ == "__main__":
     input_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph"
     output_path = Path(__file__).parent.parent.parent / "data" / "output"
     today = datetime.now().strftime("%Y-%m-%d")
 
-    #read graphs
+    # read graphs
     base_graph = Graph.from_toml(input_path / "main.md")
     elisa_graph = Graph.from_toml(input_path / "elisa.md")
     set_aside_graph = Graph.from_toml(input_path / "set_aside.md")
     investment_graph = Graph.from_toml(input_path / "investments.md")
     crypto_graph = Graph.from_toml(input_path / "crypto.md")
 
-    #combine graphs
+    # combine graphs
     base_graph.absorb_graph(elisa_graph)
     base_graph.absorb_graph(
         set_aside_graph,
@@ -278,12 +279,12 @@ if __name__ == "__main__":
         node_id_to_attach_to="Steffen",
     )
 
-    #plot result
-    base_graph.plot_graph(output_path / today / "graph") # inner function appends .png suffix
+    # plot result
+    base_graph.plot_graph(output_path / today / "graph")  # inner function appends .png suffix
 
-    #save graph to csv
+    # save graph to csv
     base_graph.save_to_csv(output_path / "graph_history.csv")
 
-    #print markdown to stdout, terminal caller can pipe it into a file
+    # print markdown to stdout, terminal caller can pipe it into a file
     print("\n# Portfolio")
     print(base_graph.to_markdown())

@@ -1,19 +1,55 @@
+@default: fmt lint test
+
+fmt: lint-ruff-format-fix lint-ruff-check-fix
+
+lint: lint-ruff-format-nofix lint-ruff-check-nofix lint-mypy
+
+test:
+    uv run -- pytest .
+
+lint-ruff-format-fix:
+    uv run -- ruff format src tests
+
+lint-ruff-check-fix:
+    uv run -- ruff check --fix src tests
+
+lint-mypy:
+    uv run -- mypy --config-file=../.mypy.ini src tests
+
+lint-ruff-format-nofix:
+    uv run -- ruff format --check src tests
+
+lint-ruff-check-nofix:
+    uv run -- ruff check src tests
+
+py-to-nb target:
+    uv run -- jupytext --to notebook "{{target}}"
+
+nb-to-py target:
+    uv run -- jupytext --to py:percent "{{target}}"
+
 prompt:
     uv run python src/finances/prompt_current_amounts.py
+
 crypto:
     bash src/finances/crypto.sh
+
 run: clean monthly depot graph
+
 clean:
     #!/bin/sh
     today=$(date +%Y-%m-%d)
     echo "Creating fresh folder data/output/$today"
     rm -rf data/output/$today/* && mkdir -p data/output/$today
+
 monthly:
     #!/bin/sh
     today=$(date +%Y-%m-%d)
     uv run python src/finances/evaluate_expenses.py >> data/output/$today/summary.md
+
 depot:
     uv run python src/finances/parse_depot.py
+
 graph:
     #!/bin/sh
     today=$(date +%Y-%m-%d)

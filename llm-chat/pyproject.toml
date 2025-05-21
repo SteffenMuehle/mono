@@ -1,18 +1,24 @@
-[tool.poetry]
-name = "llm-summary"
+[project]
+name = "llm-chat"
 version = "0.1.0"
-description = ""
-authors = ["steffen <steffen_muehle@gmx.de>"]
-readme = "README.md"
-packages = [{include = "llm_summary", from = "src"}]
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=1.60.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.13"
-jupytext = "^1.16.6"
-openai = "^1.60.0"
-notebook = "^7.3.2"
-
+[dependency-groups]
+dev = [
+    "pandas-stubs>=2.2.3",
+    "jupytext>=1.16.7",
+    "mypy>=1.15.0",
+    "notebook>=7.3.3",
+    "pytest>=8.3.5",
+    "ruff>=0.11.2",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm_chat"]

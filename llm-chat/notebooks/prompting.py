@@ -1,14 +1,13 @@
 # %%
 import os
+
 from openai import OpenAI
 
 # %%
 MODEL = "gpt-4o"
 MODEL = "gpt-4o-mini"
 
-client = OpenAI(
-  api_key= os.getenv('OPENAI_API_KEY')
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # %%
 message_list = [
@@ -39,11 +38,7 @@ message_list = [
 ]
 
 # %%
-completion = client.chat.completions.create(
-  model=MODEL,
-  store=True,
-  messages=message_list
-)
+completion = client.chat.completions.create(model=MODEL, store=True, messages=message_list)  # type: ignore
 
 # %%
 print(completion.choices[0].message.content)

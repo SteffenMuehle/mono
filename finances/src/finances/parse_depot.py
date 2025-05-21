@@ -1,6 +1,8 @@
 import csv
-import toml
 from pathlib import Path
+
+import toml
+
 
 def update_dict_from_csv(toml_dict, csv_file_path, bank):
     id_column = {
@@ -17,11 +19,11 @@ def update_dict_from_csv(toml_dict, csv_file_path, bank):
     csv_data = {}
     csv_ids = set()
     print(f"Reading CSV file: {csv_file_path}")
-    with open(csv_file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=';')
+    with open(csv_file_path) as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=";")
         for row in csv_reader:
             wkn = row[id_column]
-            value = float(row[value_column].replace('.', '').replace(',', '.'))
+            value = float(row[value_column].replace(".", "").replace(",", "."))
             csv_data[wkn] = value
             csv_ids.add(wkn)
 
@@ -41,15 +43,15 @@ def update_dict_from_csv(toml_dict, csv_file_path, bank):
                     update_toml(val, new_parent_key)
         else:
             # Infer the id from the parent_key
-            inferred_id = parent_key.split('.')[-1]
-            display_name = toml_data.get('print_name', inferred_id)
+            inferred_id = parent_key.split(".")[-1]
+            display_name = toml_data.get("print_name", inferred_id)
             display_entry = f"{display_name} ({inferred_id})"
             if inferred_id in csv_data:
-                toml_data['current_amount'] = csv_data[inferred_id]
-                if toml_data.get('freeze',False):
-                    toml_data['target_amount'] = toml_data['current_amount']
+                toml_data["current_amount"] = csv_data[inferred_id]
+                if toml_data.get("freeze", False):
+                    toml_data["target_amount"] = toml_data["current_amount"]
                     # delete 'freeze' key
-                    del toml_data['freeze']
+                    del toml_data["freeze"]
                 altered_entries.append(display_entry)
                 csv_ids.discard(inferred_id)  # Remove found ID from the set
             else:
@@ -74,14 +76,15 @@ def update_dict_from_csv(toml_dict, csv_file_path, bank):
         print(f" - {csv_id}")
 
     print("\n###############################################\n")
-    
+
     return toml_dict
+
 
 if __name__ == "__main__":
     toml_folder_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph"
     for toml_file_name in [
-        'investments_manifest.md',
-        'elisa_manifest.md',
+        "investments_manifest.md",
+        "elisa_manifest.md",
     ]:
         # Read the TOML file
         print(f"Updating {toml_file_name}...")
@@ -99,9 +102,8 @@ if __name__ == "__main__":
                 csv_file_path=csv_file_path,
                 bank=bank,
             )
-            
 
         # Write the updated TOML data back to the file
-        toml_file_path_out=toml_folder_path / toml_file_name.replace("_manifest","")
-        with open(toml_file_path_out, 'w') as toml_file:
+        toml_file_path_out = toml_folder_path / toml_file_name.replace("_manifest", "")
+        with open(toml_file_path_out, "w") as toml_file:
             toml.dump(toml_dict, toml_file)
