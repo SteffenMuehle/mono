@@ -91,7 +91,7 @@ print("\n")
 # set target in giro
 main_toml_file_path = Path(__file__).parent.parent.parent / "data" / "input" / "graph" / "main.md"
 main_dict = toml.load(main_toml_file_path)
-main_dict["root"]["Steffen"]["float"]["giro"]["target_amount"] = target_in_giro
+main_dict["total"]["Steffen"]["float"]["giro"]["target_amount"] = target_in_giro
 
 with open(main_toml_file_path, "w") as f:
     toml.dump(main_dict, f)
