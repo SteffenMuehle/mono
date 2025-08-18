@@ -40,7 +40,7 @@ def fill_current_amounts(file_path):
     traverse_and_prompt(data)
     set_aside_savings(
         source_dict=data,
-        source_key="root.Steffen.savings.ING",
+        source_key="total.Steffen.savings",
         target_file_path=set_aside_file_path,
     )
 
